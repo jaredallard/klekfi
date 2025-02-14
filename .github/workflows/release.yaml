@@ -42,7 +42,7 @@ jobs:
         with:
           experimental: true
           ## <<Stencil::Block(forgejoGithubToken)>>
-          github_token: ${{ github.token }}
+          github_token: ${{ secrets.ACTUAL_GITHUB_TOKEN }}
           ## <</Stencil::Block>>
       - name: Get Go directories
         id: go

@@ -22,7 +22,7 @@ jobs:
         with:
           experimental: true
           ## <<Stencil::Block(forgejoGithubToken)>>
-          github_token: ${{ github.token }}
+          github_token: ${{ secrets.ACTUAL_GITHUB_TOKEN }}
           ## <</Stencil::Block>>
       - name: Get Go directories
         id: go
@@ -44,12 +44,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gotestsum -- -coverprofile=cover.out ./...
-      - name: Upload test coverage
-        uses: codecov/codecov-action@v5
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: ./cover.out
-          fail_ci_if_error: true
 
   golangci-lint:
     name: golangci-lint
@@ -60,7 +54,7 @@ jobs:
         with:
           experimental: true
           ## <<Stencil::Block(forgejoGithubToken)>>
-          github_token: ${{ github.token }}
+          github_token: ${{ secrets.ACTUAL_GITHUB_TOKEN }}
           ## <</Stencil::Block>>
       - name: Retrieve golangci-lint version
         run: |
