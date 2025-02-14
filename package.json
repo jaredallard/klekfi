@@ -1,0 +1,8 @@
+{
+	"//": "Used for prettier",
+	"name": "@homelab/klefki",
+	"devDependencies": {
+		"prettier": "^3.5.1"
+	},
+	"private": true
+}

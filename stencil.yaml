@@ -1,0 +1,8 @@
+name: klefki
+arguments:
+  vcs: forgejo
+  vcs_host: git.rgst.io
+  org: homelab
+  license: AGPL-3.0
+modules:
+  - name: github.com/rgst-io/stencil-golang
