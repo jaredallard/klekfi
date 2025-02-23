@@ -47,7 +47,7 @@ type Machine struct {
 	// when initialized through [MachineFromDB] or [Machine].
 	PublicKey ed25519.PublicKey
 
-	// PrivateKye is the private key for this machine. This is normally
+	// PrivateKey is the private key for this machine. This is normally
 	// not set instead only when [NewMachine] is called.
 	PrivateKey ed25519.PrivateKey
 }
@@ -97,12 +97,12 @@ func (m *Machine) EncodePrivateKey() (string, error) {
 // EncodePublicKey returns a X509 PEM encoded public key for the
 // ed25519 public key of this machine.
 func (m *Machine) EncodePublicKey() (string, error) {
-	privKey, err := x509.MarshalPKIXPublicKey(m.PublicKey)
+	pubKey, err := x509.MarshalPKIXPublicKey(m.PublicKey)
 	if err != nil {
 		return "", fmt.Errorf("failed to marshal public key: %w", err)
 	}
 
-	encoded := pem.EncodeToMemory(&pem.Block{Type: "ED25519 PUBLIC KEY", Bytes: privKey})
+	encoded := pem.EncodeToMemory(&pem.Block{Type: "ED25519 PUBLIC KEY", Bytes: pubKey})
 	return string(encoded), nil
 }
 

@@ -4,7 +4,6 @@ go 1.23
 
 require (
 	entgo.io/ent v0.14.2
-	github.com/davecgh/go-spew v1.1.1
 	github.com/ncruces/go-sqlite3 v0.23.1
 	github.com/spf13/cobra v1.9.1
 	google.golang.org/grpc v1.70.0

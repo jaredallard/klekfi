@@ -31,7 +31,7 @@ import (
 
 // New creates a new connection to the DB.
 func New(ctx context.Context) (*ent.Client, error) {
-	client, err := ent.Open(dialect.SQLite, "file:data/klefkictl.db")
+	client, err := ent.Open(dialect.SQLite, "file:data/klefki.db")
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
 	}
