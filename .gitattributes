@@ -3,5 +3,6 @@ stencil.lock linguist-generated
 bun.lockb linguist-generated
 
 ## <<Stencil::Block(custom)>>
-
+internal/db/ent/** linguist-generated
+internal/db/ent/schema/** -linguist-generated
 ## <</Stencil::Block>>

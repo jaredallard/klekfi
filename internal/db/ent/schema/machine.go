@@ -15,39 +15,22 @@
 //
 // SPDX-License-Identifier: AGPL-3.0
 
-package main
+package schema
 
 import (
-	"context"
-	"fmt"
-	"os"
-	"os/signal"
-
-	"git.rgst.io/homelab/klefki/internal/server"
+	"entgo.io/ent"
+	"entgo.io/ent/schema/field"
 )
 
-func main() {
-	exitCode := 0
-	defer func() { os.Exit(exitCode) }()
+// Machine holds the schema definition for the Machine entity.
+type Machine struct {
+	ent.Schema
+}
 
-	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, os.Kill)
-	defer cancel()
-
-	s := (server.Server{})
-	go func() {
-		if err := s.Run(ctx); err != nil {
-			fmt.Fprintf(os.Stderr, "failed to start server: %v\n", err)
-			exitCode = 1
-			cancel()
-		}
-	}()
-
-	<-ctx.Done()
-	fmt.Println() // better XP for ^C
-
-	if err := s.Close(context.Background()); err != nil {
-		fmt.Fprintf(os.Stderr, "failed to close server: %v\n", err)
-		exitCode = 1
-		return
+// Fields of the Machine.
+func (Machine) Fields() []ent.Field {
+	return []ent.Field{
+		field.String("id").Comment("Fingerprint of the public key"),
+		field.String("public_key").Comment("Public key of the machine"),
 	}
 }

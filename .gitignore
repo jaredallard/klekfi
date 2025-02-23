@@ -47,5 +47,6 @@ launch.json
 CHANGELOG.md
 
 ## <<Stencil::Block(custom)>>
-
+data/
+!data/.gitkeep
 ## <</Stencil::Block>>

@@ -1,0 +1,18 @@
+edition = "2023";
+
+package rgst.klefki.v1;
+
+import "google/protobuf/go_features.proto";
+
+option features.(pb.go).api_level = API_OPAQUE;
+option go_package = "git.rgst.io/internal/grpc/generated/go/rgst/klefki/v1";
+
+message GetKeyRequest {}
+
+message GetKeyResponse {
+  string key = 1;
+}
+
+service KlefkiService {
+  rpc GetKey(GetKeyRequest) returns (GetKeyResponse);
+}

@@ -11,6 +11,13 @@ goreleaser = "latest"
 "go:mvdan.cc/sh/v3/cmd/shfmt" = "latest"
 "go:github.com/thenativeweb/get-next-version" = "latest"
 
+# gRPC
+"aqua:bufbuild/buf" = "1.50.0"
+"go:google.golang.org/protobuf/cmd/protoc-gen-go" = "1.36.5"
+"go:google.golang.org/grpc/cmd/protoc-gen-go-grpc" = "1.5.1"
+"go:github.com/fullstorydev/grpcui/cmd/grpcui" = "1.4.2"
+"aqua:protocolbuffers/protobuf/protoc" = "24.3"
+
 [tasks.build]
 description = "Build a binary for the current platform/architecture"
 run = "go build -trimpath -o ./bin/ -v ./cmd/..."
@@ -29,6 +36,7 @@ run = [
 	"goimports -w .",
 	"shfmt -w .",
 	"bun node_modules/.bin/prettier --write '**/*.{json,yaml,yml,md,jsonschema.json}'",
+	"buf format -w",
 ]
 
 [tasks.lint]
@@ -46,5 +54,12 @@ description = "Run tests"
 run = "gotestsum"
 
 ## <<Stencil::Block(custom)>>
+[tasks.dev]
+description = "Live reload target (use with `mise run watch`)"
+depends = ["build"]
+run = ["./bin/klefki"]
 
+[tasks.watch]
+description = "Watch for changes"
+run = ["mise watch -t dev --restart"]
 ## <</Stencil::Block>>

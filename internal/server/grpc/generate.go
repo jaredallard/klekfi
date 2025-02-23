@@ -15,39 +15,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0
 
-package main
+// Package grpc is not a consumable package. This is used only to
+// trigger the generation of protobuf and associated gRPC artifacts.
+package grpc
 
-import (
-	"context"
-	"fmt"
-	"os"
-	"os/signal"
-
-	"git.rgst.io/homelab/klefki/internal/server"
-)
-
-func main() {
-	exitCode := 0
-	defer func() { os.Exit(exitCode) }()
-
-	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, os.Kill)
-	defer cancel()
-
-	s := (server.Server{})
-	go func() {
-		if err := s.Run(ctx); err != nil {
-			fmt.Fprintf(os.Stderr, "failed to start server: %v\n", err)
-			exitCode = 1
-			cancel()
-		}
-	}()
-
-	<-ctx.Done()
-	fmt.Println() // better XP for ^C
-
-	if err := s.Close(context.Background()); err != nil {
-		fmt.Fprintf(os.Stderr, "failed to close server: %v\n", err)
-		exitCode = 1
-		return
-	}
-}
+//go:generate bash -c "cd ../../../ && exec buf generate"
