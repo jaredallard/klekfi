@@ -15,25 +15,31 @@
 //
 // SPDX-License-Identifier: AGPL-3.0
 
-package schema
+// Package db contains the DB glue logic.
+package db
 
 import (
-	"time"
+	"context"
+	"fmt"
 
-	"entgo.io/ent"
-	"entgo.io/ent/schema/field"
+	"entgo.io/ent/dialect"
+	"git.rgst.io/homelab/klefki/internal/db/ent"
+
+	_ "github.com/ncruces/go-sqlite3/driver" // Used by ent.
+	_ "github.com/ncruces/go-sqlite3/embed"  // Also used by ent.
 )
 
-// Machine holds the schema definition for the Machine entity.
-type Machine struct {
-	ent.Schema
-}
-
-// Fields of the Machine.
-func (Machine) Fields() []ent.Field {
-	return []ent.Field{
-		field.String("id").Comment("Fingerprint of the public key"),
-		field.Bytes("public_key").Comment("Public key of the machine"),
-		field.String("created_at").Comment("When this machine was added in UTC").Default(time.Now().UTC().Format(time.RFC3339)),
+// New creates a new connection to the DB.
+func New(ctx context.Context) (*ent.Client, error) {
+	client, err := ent.Open(dialect.SQLite, "file:data/klefkictl.db")
+	if err != nil {
+		return nil, fmt.Errorf("failed to open database: %w", err)
 	}
+
+	// Run the automatic migration tool to create all schema resources.
+	if err := client.Schema.Create(ctx); err != nil {
+		return nil, fmt.Errorf("failed to run DB migrations: %w", err)
+	}
+
+	return client, nil
 }

@@ -2,8 +2,19 @@
 
 package ent
 
+import (
+	"git.rgst.io/homelab/klefki/internal/db/ent/machine"
+	"git.rgst.io/homelab/klefki/internal/db/ent/schema"
+)
+
 // The init function reads all schema descriptors with runtime code
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	machineFields := schema.Machine{}.Fields()
+	_ = machineFields
+	// machineDescCreatedAt is the schema descriptor for created_at field.
+	machineDescCreatedAt := machineFields[2].Descriptor()
+	// machine.DefaultCreatedAt holds the default value on creation for the created_at field.
+	machine.DefaultCreatedAt = machineDescCreatedAt.Default.(string)
 }

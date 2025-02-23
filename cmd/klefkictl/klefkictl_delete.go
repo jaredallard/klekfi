@@ -15,25 +15,29 @@
 //
 // SPDX-License-Identifier: AGPL-3.0
 
-package schema
+package main
 
 import (
-	"time"
+	"fmt"
 
-	"entgo.io/ent"
-	"entgo.io/ent/schema/field"
+	"git.rgst.io/homelab/klefki/internal/db"
+	"github.com/spf13/cobra"
 )
 
-// Machine holds the schema definition for the Machine entity.
-type Machine struct {
-	ent.Schema
-}
+// newDeleteCommand creates a dekete [cobra.Command]
+func newDeleteCommand() *cobra.Command {
+	return &cobra.Command{
+		Use:   "delete <fingerprint>",
+		Short: "Delete a known machine by fingerprint",
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			db, err := db.New(cmd.Context())
+			if err != nil {
+				return fmt.Errorf("failed to open DB: %w", err)
+			}
+			defer db.Close()
 
-// Fields of the Machine.
-func (Machine) Fields() []ent.Field {
-	return []ent.Field{
-		field.String("id").Comment("Fingerprint of the public key"),
-		field.Bytes("public_key").Comment("Public key of the machine"),
-		field.String("created_at").Comment("When this machine was added in UTC").Default(time.Now().UTC().Format(time.RFC3339)),
+			return db.Machine.DeleteOneID(args[0]).Exec(cmd.Context())
+		},
 	}
 }

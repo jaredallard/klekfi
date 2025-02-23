@@ -4,5 +4,8 @@ arguments:
   vcs_host: git.rgst.io
   org: homelab
   license: AGPL-3.0
+  commands:
+    - klefki
+    - klefkictl
 modules:
   - name: github.com/rgst-io/stencil-golang

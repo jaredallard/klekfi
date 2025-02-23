@@ -15,25 +15,6 @@
 //
 // SPDX-License-Identifier: AGPL-3.0
 
-package schema
-
-import (
-	"time"
-
-	"entgo.io/ent"
-	"entgo.io/ent/schema/field"
-)
-
-// Machine holds the schema definition for the Machine entity.
-type Machine struct {
-	ent.Schema
-}
-
-// Fields of the Machine.
-func (Machine) Fields() []ent.Field {
-	return []ent.Field{
-		field.String("id").Comment("Fingerprint of the public key"),
-		field.Bytes("public_key").Comment("Public key of the machine"),
-		field.String("created_at").Comment("When this machine was added in UTC").Default(time.Now().UTC().Format(time.RFC3339)),
-	}
-}
+// Package machines contains all of the code for creating and managing
+// machines.
+package machines

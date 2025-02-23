@@ -18,7 +18,9 @@ type Machine struct {
 	// Fingerprint of the public key
 	ID string `json:"id,omitempty"`
 	// Public key of the machine
-	PublicKey    string `json:"public_key,omitempty"`
+	PublicKey []byte `json:"public_key,omitempty"`
+	// When this machine was added in UTC
+	CreatedAt    string `json:"created_at,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -27,7 +29,9 @@ func (*Machine) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case machine.FieldID, machine.FieldPublicKey:
+		case machine.FieldPublicKey:
+			values[i] = new([]byte)
+		case machine.FieldID, machine.FieldCreatedAt:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -51,10 +55,16 @@ func (m *Machine) assignValues(columns []string, values []any) error {
 				m.ID = value.String
 			}
 		case machine.FieldPublicKey:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field public_key", values[i])
+			} else if value != nil {
+				m.PublicKey = *value
+			}
+		case machine.FieldCreatedAt:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				m.PublicKey = value.String
+				m.CreatedAt = value.String
 			}
 		default:
 			m.selectValues.Set(columns[i], values[i])
@@ -93,7 +103,10 @@ func (m *Machine) String() string {
 	builder.WriteString("Machine(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", m.ID))
 	builder.WriteString("public_key=")
-	builder.WriteString(m.PublicKey)
+	builder.WriteString(fmt.Sprintf("%v", m.PublicKey))
+	builder.WriteString(", ")
+	builder.WriteString("created_at=")
+	builder.WriteString(m.CreatedAt)
 	builder.WriteByte(')')
 	return builder.String()
 }

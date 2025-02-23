@@ -33,6 +33,34 @@ builds:
       - goos: windows
         goarch: arm
     mod_timestamp: "{{ .CommitTimestamp }}"
+  - main: ./cmd/klefkictl
+    flags:
+      - -trimpath
+    ldflags:
+      - -s
+      - -w
+      ## <<Stencil::Block(klefkictlLdflags)>>
+
+      ## <</Stencil::Block>>
+    env:
+      - CGO_ENABLED=0
+    goarch:
+      - amd64
+      - arm64
+      ## <<Stencil::Block(klefkictlExtraArch)>>
+
+      ## <</Stencil::Block>>
+    goos:
+      - linux
+      - darwin
+      - windows
+      ## <<Stencil::Block(klefkictlExtraOS)>>
+
+      ## <</Stencil::Block>>
+    ignore:
+      - goos: windows
+        goarch: arm
+    mod_timestamp: "{{ .CommitTimestamp }}"
 checksum:
   name_template: "checksums.txt"
 snapshot:

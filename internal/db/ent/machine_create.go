@@ -20,8 +20,22 @@ type MachineCreate struct {
 }
 
 // SetPublicKey sets the "public_key" field.
-func (mc *MachineCreate) SetPublicKey(s string) *MachineCreate {
-	mc.mutation.SetPublicKey(s)
+func (mc *MachineCreate) SetPublicKey(b []byte) *MachineCreate {
+	mc.mutation.SetPublicKey(b)
+	return mc
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (mc *MachineCreate) SetCreatedAt(s string) *MachineCreate {
+	mc.mutation.SetCreatedAt(s)
+	return mc
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (mc *MachineCreate) SetNillableCreatedAt(s *string) *MachineCreate {
+	if s != nil {
+		mc.SetCreatedAt(*s)
+	}
 	return mc
 }
 
@@ -38,6 +52,7 @@ func (mc *MachineCreate) Mutation() *MachineMutation {
 
 // Save creates the Machine in the database.
 func (mc *MachineCreate) Save(ctx context.Context) (*Machine, error) {
+	mc.defaults()
 	return withHooks(ctx, mc.sqlSave, mc.mutation, mc.hooks)
 }
 
@@ -63,10 +78,21 @@ func (mc *MachineCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (mc *MachineCreate) defaults() {
+	if _, ok := mc.mutation.CreatedAt(); !ok {
+		v := machine.DefaultCreatedAt
+		mc.mutation.SetCreatedAt(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (mc *MachineCreate) check() error {
 	if _, ok := mc.mutation.PublicKey(); !ok {
 		return &ValidationError{Name: "public_key", err: errors.New(`ent: missing required field "Machine.public_key"`)}
+	}
+	if _, ok := mc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Machine.created_at"`)}
 	}
 	return nil
 }
@@ -104,8 +130,12 @@ func (mc *MachineCreate) createSpec() (*Machine, *sqlgraph.CreateSpec) {
 		_spec.ID.Value = id
 	}
 	if value, ok := mc.mutation.PublicKey(); ok {
-		_spec.SetField(machine.FieldPublicKey, field.TypeString, value)
+		_spec.SetField(machine.FieldPublicKey, field.TypeBytes, value)
 		_node.PublicKey = value
+	}
+	if value, ok := mc.mutation.CreatedAt(); ok {
+		_spec.SetField(machine.FieldCreatedAt, field.TypeString, value)
+		_node.CreatedAt = value
 	}
 	return _node, _spec
 }
@@ -128,6 +158,7 @@ func (mcb *MachineCreateBulk) Save(ctx context.Context) ([]*Machine, error) {
 	for i := range mcb.builders {
 		func(i int, root context.Context) {
 			builder := mcb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*MachineMutation)
 				if !ok {

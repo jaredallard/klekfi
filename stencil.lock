@@ -57,6 +57,9 @@ files:
     - name: cmd/klefki/klefki.go
       template: cmd/$name/name.go.tpl
       module: github.com/rgst-io/stencil-golang
+    - name: cmd/klefkictl/klefkictl.go
+      template: cmd/$name/name.go.tpl
+      module: github.com/rgst-io/stencil-golang
     - name: go.mod
       template: go.mod.tpl
       module: github.com/rgst-io/stencil-golang

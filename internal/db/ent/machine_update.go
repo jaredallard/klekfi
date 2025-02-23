@@ -28,15 +28,21 @@ func (mu *MachineUpdate) Where(ps ...predicate.Machine) *MachineUpdate {
 }
 
 // SetPublicKey sets the "public_key" field.
-func (mu *MachineUpdate) SetPublicKey(s string) *MachineUpdate {
-	mu.mutation.SetPublicKey(s)
+func (mu *MachineUpdate) SetPublicKey(b []byte) *MachineUpdate {
+	mu.mutation.SetPublicKey(b)
 	return mu
 }
 
-// SetNillablePublicKey sets the "public_key" field if the given value is not nil.
-func (mu *MachineUpdate) SetNillablePublicKey(s *string) *MachineUpdate {
+// SetCreatedAt sets the "created_at" field.
+func (mu *MachineUpdate) SetCreatedAt(s string) *MachineUpdate {
+	mu.mutation.SetCreatedAt(s)
+	return mu
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (mu *MachineUpdate) SetNillableCreatedAt(s *string) *MachineUpdate {
 	if s != nil {
-		mu.SetPublicKey(*s)
+		mu.SetCreatedAt(*s)
 	}
 	return mu
 }
@@ -83,7 +89,10 @@ func (mu *MachineUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 	}
 	if value, ok := mu.mutation.PublicKey(); ok {
-		_spec.SetField(machine.FieldPublicKey, field.TypeString, value)
+		_spec.SetField(machine.FieldPublicKey, field.TypeBytes, value)
+	}
+	if value, ok := mu.mutation.CreatedAt(); ok {
+		_spec.SetField(machine.FieldCreatedAt, field.TypeString, value)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, mu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -106,15 +115,21 @@ type MachineUpdateOne struct {
 }
 
 // SetPublicKey sets the "public_key" field.
-func (muo *MachineUpdateOne) SetPublicKey(s string) *MachineUpdateOne {
-	muo.mutation.SetPublicKey(s)
+func (muo *MachineUpdateOne) SetPublicKey(b []byte) *MachineUpdateOne {
+	muo.mutation.SetPublicKey(b)
 	return muo
 }
 
-// SetNillablePublicKey sets the "public_key" field if the given value is not nil.
-func (muo *MachineUpdateOne) SetNillablePublicKey(s *string) *MachineUpdateOne {
+// SetCreatedAt sets the "created_at" field.
+func (muo *MachineUpdateOne) SetCreatedAt(s string) *MachineUpdateOne {
+	muo.mutation.SetCreatedAt(s)
+	return muo
+}
+
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (muo *MachineUpdateOne) SetNillableCreatedAt(s *string) *MachineUpdateOne {
 	if s != nil {
-		muo.SetPublicKey(*s)
+		muo.SetCreatedAt(*s)
 	}
 	return muo
 }
@@ -191,7 +206,10 @@ func (muo *MachineUpdateOne) sqlSave(ctx context.Context) (_node *Machine, err e
 		}
 	}
 	if value, ok := muo.mutation.PublicKey(); ok {
-		_spec.SetField(machine.FieldPublicKey, field.TypeString, value)
+		_spec.SetField(machine.FieldPublicKey, field.TypeBytes, value)
+	}
+	if value, ok := muo.mutation.CreatedAt(); ok {
+		_spec.SetField(machine.FieldCreatedAt, field.TypeString, value)
 	}
 	_node = &Machine{config: muo.config}
 	_spec.Assign = _node.assignValues

@@ -15,25 +15,35 @@
 //
 // SPDX-License-Identifier: AGPL-3.0
 
-package schema
+package main
 
 import (
-	"time"
+	"context"
+	"fmt"
+	"os"
+	"os/signal"
 
-	"entgo.io/ent"
-	"entgo.io/ent/schema/field"
+	"github.com/spf13/cobra"
 )
 
-// Machine holds the schema definition for the Machine entity.
-type Machine struct {
-	ent.Schema
-}
+func main() {
+	exitCode := 0
+	defer func() { os.Exit(exitCode) }()
 
-// Fields of the Machine.
-func (Machine) Fields() []ent.Field {
-	return []ent.Field{
-		field.String("id").Comment("Fingerprint of the public key"),
-		field.Bytes("public_key").Comment("Public key of the machine"),
-		field.String("created_at").Comment("When this machine was added in UTC").Default(time.Now().UTC().Format(time.RFC3339)),
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, os.Kill)
+	defer cancel()
+
+	rootCmd := &cobra.Command{
+		Use:   "klefkictl",
+		Short: "CLI for interacting with klefki",
+	}
+	rootCmd.AddCommand(
+		newNewCommand(),
+		newListCommand(),
+		newDeleteCommand(),
+	)
+	if err := rootCmd.ExecuteContext(ctx); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		exitCode = 1
 	}
 }

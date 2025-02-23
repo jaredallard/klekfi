@@ -32,7 +32,8 @@ type MachineMutation struct {
 	op            Op
 	typ           string
 	id            *string
-	public_key    *string
+	public_key    *[]byte
+	created_at    *string
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*Machine, error)
@@ -144,12 +145,12 @@ func (m *MachineMutation) IDs(ctx context.Context) ([]string, error) {
 }
 
 // SetPublicKey sets the "public_key" field.
-func (m *MachineMutation) SetPublicKey(s string) {
-	m.public_key = &s
+func (m *MachineMutation) SetPublicKey(b []byte) {
+	m.public_key = &b
 }
 
 // PublicKey returns the value of the "public_key" field in the mutation.
-func (m *MachineMutation) PublicKey() (r string, exists bool) {
+func (m *MachineMutation) PublicKey() (r []byte, exists bool) {
 	v := m.public_key
 	if v == nil {
 		return
@@ -160,7 +161,7 @@ func (m *MachineMutation) PublicKey() (r string, exists bool) {
 // OldPublicKey returns the old "public_key" field's value of the Machine entity.
 // If the Machine object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MachineMutation) OldPublicKey(ctx context.Context) (v string, err error) {
+func (m *MachineMutation) OldPublicKey(ctx context.Context) (v []byte, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldPublicKey is only allowed on UpdateOne operations")
 	}
@@ -177,6 +178,42 @@ func (m *MachineMutation) OldPublicKey(ctx context.Context) (v string, err error
 // ResetPublicKey resets all changes to the "public_key" field.
 func (m *MachineMutation) ResetPublicKey() {
 	m.public_key = nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *MachineMutation) SetCreatedAt(s string) {
+	m.created_at = &s
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *MachineMutation) CreatedAt() (r string, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Machine entity.
+// If the Machine object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MachineMutation) OldCreatedAt(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *MachineMutation) ResetCreatedAt() {
+	m.created_at = nil
 }
 
 // Where appends a list predicates to the MachineMutation builder.
@@ -213,9 +250,12 @@ func (m *MachineMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *MachineMutation) Fields() []string {
-	fields := make([]string, 0, 1)
+	fields := make([]string, 0, 2)
 	if m.public_key != nil {
 		fields = append(fields, machine.FieldPublicKey)
+	}
+	if m.created_at != nil {
+		fields = append(fields, machine.FieldCreatedAt)
 	}
 	return fields
 }
@@ -227,6 +267,8 @@ func (m *MachineMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case machine.FieldPublicKey:
 		return m.PublicKey()
+	case machine.FieldCreatedAt:
+		return m.CreatedAt()
 	}
 	return nil, false
 }
@@ -238,6 +280,8 @@ func (m *MachineMutation) OldField(ctx context.Context, name string) (ent.Value,
 	switch name {
 	case machine.FieldPublicKey:
 		return m.OldPublicKey(ctx)
+	case machine.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
 	}
 	return nil, fmt.Errorf("unknown Machine field %s", name)
 }
@@ -248,11 +292,18 @@ func (m *MachineMutation) OldField(ctx context.Context, name string) (ent.Value,
 func (m *MachineMutation) SetField(name string, value ent.Value) error {
 	switch name {
 	case machine.FieldPublicKey:
-		v, ok := value.(string)
+		v, ok := value.([]byte)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetPublicKey(v)
+		return nil
+	case machine.FieldCreatedAt:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Machine field %s", name)
@@ -305,6 +356,9 @@ func (m *MachineMutation) ResetField(name string) error {
 	switch name {
 	case machine.FieldPublicKey:
 		m.ResetPublicKey()
+		return nil
+	case machine.FieldCreatedAt:
+		m.ResetCreatedAt()
 		return nil
 	}
 	return fmt.Errorf("unknown Machine field %s", name)

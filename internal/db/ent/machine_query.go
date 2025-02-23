@@ -262,7 +262,7 @@ func (mq *MachineQuery) Clone() *MachineQuery {
 // Example:
 //
 //	var v []struct {
-//		PublicKey string `json:"public_key,omitempty"`
+//		PublicKey []byte `json:"public_key,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -285,7 +285,7 @@ func (mq *MachineQuery) GroupBy(field string, fields ...string) *MachineGroupBy 
 // Example:
 //
 //	var v []struct {
-//		PublicKey string `json:"public_key,omitempty"`
+//		PublicKey []byte `json:"public_key,omitempty"`
 //	}
 //
 //	client.Machine.Query().

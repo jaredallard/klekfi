@@ -46,8 +46,14 @@ func (s *Server) Run(_ context.Context) error {
 	}
 
 	fmt.Printf("starting gRPC server on %s\n", lis.Addr())
-
 	return s.gs.Serve(lis)
+}
+
+// GetKey implements the GetKey request
+func (s *Server) GetKey(_ context.Context, _ *pbgrpcv1.GetKeyRequest) (*pbgrpcv1.GetKeyResponse, error) {
+	resp := &pbgrpcv1.GetKeyResponse{}
+	resp.SetKey("hello-world")
+	return resp, nil
 }
 
 // Close closes the server
