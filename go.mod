@@ -4,7 +4,7 @@ go 1.23
 
 require (
 	entgo.io/ent v0.14.2
-	github.com/ncruces/go-sqlite3 v0.23.1
+	github.com/ncruces/go-sqlite3 v0.23.3
 	github.com/spf13/cobra v1.9.1
 	google.golang.org/grpc v1.70.0
 	google.golang.org/protobuf v1.36.5
