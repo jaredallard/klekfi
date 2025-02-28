@@ -1,10 +1,12 @@
 module git.rgst.io/homelab/klefki
 
-go 1.23
+go 1.23.0
+
+toolchain go1.24.0
 
 require (
 	entgo.io/ent v0.14.3
-	github.com/ncruces/go-sqlite3 v0.23.3
+	github.com/ncruces/go-sqlite3 v0.24.0
 	github.com/spf13/cobra v1.9.1
 	google.golang.org/grpc v1.70.0
 	google.golang.org/protobuf v1.36.5
