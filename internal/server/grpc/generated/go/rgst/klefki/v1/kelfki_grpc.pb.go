@@ -19,17 +19,17 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	KlefkiService_CreateSession_FullMethodName = "/rgst.klefki.v1.KlefkiService/CreateSession"
-	KlefkiService_GetKey_FullMethodName        = "/rgst.klefki.v1.KlefkiService/GetKey"
-	KlefkiService_ListSessions_FullMethodName  = "/rgst.klefki.v1.KlefkiService/ListSessions"
-	KlefkiService_SubmitKey_FullMethodName     = "/rgst.klefki.v1.KlefkiService/SubmitKey"
+	KlefkiService_GetTime_FullMethodName      = "/rgst.klefki.v1.KlefkiService/GetTime"
+	KlefkiService_GetKey_FullMethodName       = "/rgst.klefki.v1.KlefkiService/GetKey"
+	KlefkiService_ListSessions_FullMethodName = "/rgst.klefki.v1.KlefkiService/ListSessions"
+	KlefkiService_SubmitKey_FullMethodName    = "/rgst.klefki.v1.KlefkiService/SubmitKey"
 )
 
 // KlefkiServiceClient is the client API for KlefkiService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type KlefkiServiceClient interface {
-	CreateSession(ctx context.Context, in *CreateSessionRequest, opts ...grpc.CallOption) (*CreateSessionResponse, error)
+	GetTime(ctx context.Context, in *GetTimeRequest, opts ...grpc.CallOption) (*GetTimeResponse, error)
 	GetKey(ctx context.Context, in *GetKeyRequest, opts ...grpc.CallOption) (*GetKeyResponse, error)
 	ListSessions(ctx context.Context, in *ListSessionsRequest, opts ...grpc.CallOption) (*ListSessionsResponse, error)
 	SubmitKey(ctx context.Context, in *SubmitKeyRequest, opts ...grpc.CallOption) (*SubmitKeyResponse, error)
@@ -43,10 +43,10 @@ func NewKlefkiServiceClient(cc grpc.ClientConnInterface) KlefkiServiceClient {
 	return &klefkiServiceClient{cc}
 }
 
-func (c *klefkiServiceClient) CreateSession(ctx context.Context, in *CreateSessionRequest, opts ...grpc.CallOption) (*CreateSessionResponse, error) {
+func (c *klefkiServiceClient) GetTime(ctx context.Context, in *GetTimeRequest, opts ...grpc.CallOption) (*GetTimeResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CreateSessionResponse)
-	err := c.cc.Invoke(ctx, KlefkiService_CreateSession_FullMethodName, in, out, cOpts...)
+	out := new(GetTimeResponse)
+	err := c.cc.Invoke(ctx, KlefkiService_GetTime_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func (c *klefkiServiceClient) SubmitKey(ctx context.Context, in *SubmitKeyReques
 // All implementations must embed UnimplementedKlefkiServiceServer
 // for forward compatibility.
 type KlefkiServiceServer interface {
-	CreateSession(context.Context, *CreateSessionRequest) (*CreateSessionResponse, error)
+	GetTime(context.Context, *GetTimeRequest) (*GetTimeResponse, error)
 	GetKey(context.Context, *GetKeyRequest) (*GetKeyResponse, error)
 	ListSessions(context.Context, *ListSessionsRequest) (*ListSessionsResponse, error)
 	SubmitKey(context.Context, *SubmitKeyRequest) (*SubmitKeyResponse, error)
@@ -101,8 +101,8 @@ type KlefkiServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedKlefkiServiceServer struct{}
 
-func (UnimplementedKlefkiServiceServer) CreateSession(context.Context, *CreateSessionRequest) (*CreateSessionResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateSession not implemented")
+func (UnimplementedKlefkiServiceServer) GetTime(context.Context, *GetTimeRequest) (*GetTimeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTime not implemented")
 }
 func (UnimplementedKlefkiServiceServer) GetKey(context.Context, *GetKeyRequest) (*GetKeyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetKey not implemented")
@@ -134,20 +134,20 @@ func RegisterKlefkiServiceServer(s grpc.ServiceRegistrar, srv KlefkiServiceServe
 	s.RegisterService(&KlefkiService_ServiceDesc, srv)
 }
 
-func _KlefkiService_CreateSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateSessionRequest)
+func _KlefkiService_GetTime_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTimeRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(KlefkiServiceServer).CreateSession(ctx, in)
+		return srv.(KlefkiServiceServer).GetTime(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: KlefkiService_CreateSession_FullMethodName,
+		FullMethod: KlefkiService_GetTime_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KlefkiServiceServer).CreateSession(ctx, req.(*CreateSessionRequest))
+		return srv.(KlefkiServiceServer).GetTime(ctx, req.(*GetTimeRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -214,8 +214,8 @@ var KlefkiService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*KlefkiServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "CreateSession",
-			Handler:    _KlefkiService_CreateSession_Handler,
+			MethodName: "GetTime",
+			Handler:    _KlefkiService_GetTime_Handler,
 		},
 		{
 			MethodName: "GetKey",

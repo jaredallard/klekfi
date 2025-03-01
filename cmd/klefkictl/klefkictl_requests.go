@@ -25,12 +25,12 @@ import (
 	"text/tabwriter"
 
 	pbgrpcv1 "git.rgst.io/homelab/klefki/internal/server/grpc/generated/go/rgst/klefki/v1"
+	"git.rgst.io/homelab/klefki/pkg/client"
 
 	"git.rgst.io/homelab/klefki/internal/machines"
 	"git.rgst.io/homelab/sigtool/v3/sign"
+	"github.com/google/uuid"
 	"github.com/spf13/cobra"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 )
 
 // newRequestsCommand creates a requests [cobra.Command]
@@ -43,6 +43,8 @@ func newRequestsCommand() *cobra.Command {
 		newGetKeyRequestCommand(),
 		newListSessionsCommand(),
 	)
+	flags := cmd.Flags()
+	flags.String("hostname", "127.0.0.1:5300", "hostname of the klefki server to connect to")
 	return cmd
 }
 
@@ -54,6 +56,7 @@ func newGetKeyRequestCommand() *cobra.Command {
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			privKeyPath := cmd.Flag("priv-key").Value.String()
+			hostname := cmd.Parent().Flag("hostname").Value.String()
 
 			privKeyByt, err := os.ReadFile(privKeyPath)
 			if err != nil {
@@ -77,40 +80,36 @@ func newGetKeyRequestCommand() *cobra.Command {
 
 			fmt.Printf("Sending GetKeyRequest: machine_id=%s\n", machineID)
 
-			// TODO(jaredallard): Make a client
-			conn, err := grpc.NewClient("127.0.0.1:5300", grpc.WithTransportCredentials(insecure.NewCredentials()))
+			kc, kcclose, err := client.Dial(hostname)
 			if err != nil {
-				return fmt.Errorf("failed to connect to klefki server: %w", err)
+				return err
 			}
-			defer conn.Close()
+			defer kcclose() //nolint:errcheck // Why: Best effort
 
-			client := pbgrpcv1.NewKlefkiServiceClient(conn)
-
-			req := &pbgrpcv1.CreateSessionRequest{}
+			req := &pbgrpcv1.GetKeyRequest{}
 			req.SetMachineId(machineID)
-			req.SetNonce("FIXME")
+			req.SetNonce(uuid.New().String())
 			req.SetSignature(ed25519.Sign(pk, []byte(req.GetNonce())))
 
-			resp, err := client.CreateSession(cmd.Context(), req)
+			resp, err := kc.GetKey(cmd.Context(), req)
 			if err != nil {
 				return fmt.Errorf("failed to get key from server: %w", err)
 			}
 
-			encSessionID := resp.GetEncSessionId()
-			dec, err := sign.NewDecryptor(bytes.NewReader(encSessionID))
+			dec, err := sign.NewDecryptor(bytes.NewReader(resp.GetEncKey()))
 			if err != nil {
 				return fmt.Errorf("failed to create decryptor: %w", err)
 			}
 			if err := dec.SetPrivateKey(spk, nil); err != nil {
 				return fmt.Errorf("failed to set private key on decryptor: %w", err)
 			}
+
 			var buf bytes.Buffer
 			if err := dec.Decrypt(&buf); err != nil {
 				return fmt.Errorf("failed to decrypt session ID: %w", err)
 			}
 
-			sessionID := buf.String()
-			fmt.Println(sessionID)
+			fmt.Println(buf.String())
 			return nil
 		},
 	}
@@ -126,15 +125,13 @@ func newListSessionsCommand() *cobra.Command {
 		Short: "Return a list of all machines waiting for a key to be provided",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			// TODO(jaredallard): Make a client
-			conn, err := grpc.NewClient("127.0.0.1:5300", grpc.WithTransportCredentials(insecure.NewCredentials()))
+			kc, kcclose, err := client.Dial(cmd.Flag("hostname").Value.String())
 			if err != nil {
-				return fmt.Errorf("failed to connect to klefki server: %w", err)
+				return err
 			}
-			defer conn.Close()
+			defer kcclose() //nolint:errcheck // Why: Best effort
 
-			client := pbgrpcv1.NewKlefkiServiceClient(conn)
-			resp, err := client.ListSessions(cmd.Context(), &pbgrpcv1.ListSessionsRequest{})
+			resp, err := kc.ListSessions(cmd.Context(), &pbgrpcv1.ListSessionsRequest{})
 			if err != nil {
 				return fmt.Errorf("failed to get key from server: %w", err)
 			}

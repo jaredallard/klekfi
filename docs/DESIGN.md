@@ -29,15 +29,13 @@ disk.
 
 ### Endpoints
 
-- `CreateSession() string` - Creates a new session for the machineID and
-  returns it.
-- `GetKey(sessionID string) string` - If connected to a client through
+- `GetKey() string` - If connected to a client through
   `SubmitKey`, returns the key, otherwise waits for a period of time
   then the caller should retry the endpoint (polling).
 - `ListSessions() []MachineID` - Returns a list of machine IDs waiting
   for a key to be provided.
 - `SubmitKey(key []byte, machineID string)` - If a session is present
-  for the provided `machindID`, then the key is stored in memory on the
+  for the provided `machineID`, then the key is stored in memory on the
   server side and provided when `GetKey` is next called by the machine.
   Note that `key` is expected to be encrypted to the `machineID`'s
   public key, which is obtained through `ListSessions` beforehand.

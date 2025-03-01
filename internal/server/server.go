@@ -19,12 +19,10 @@
 package server
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"io"
 	"net"
-	"strings"
 	"sync"
 	"time"
 
@@ -33,7 +31,6 @@ import (
 	"git.rgst.io/homelab/klefki/internal/machines"
 	pbgrpcv1 "git.rgst.io/homelab/klefki/internal/server/grpc/generated/go/rgst/klefki/v1"
 	"git.rgst.io/homelab/sigtool/v3/sign"
-	"github.com/google/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -53,13 +50,12 @@ func newNopWriteCloser(w io.Writer) *nopWriteCloser {
 	return &nopWriteCloser{w}
 }
 
+// Session represents a session where a machine is attempting to receive
+// a private key from SubmitKey.
 type Session struct {
-	// CreatedAt is when the provided session was created. Should be in
-	// UTC.
-	CreatedAt time.Time
-
-	// ID is the session ID, this is used as an authenticate gate.
-	ID uuid.UUID
+	// LastAsked is the last time the machine called GetKey without
+	// receiving a key.
+	LastAsked time.Time
 
 	// EncKey is the encrypted provided by SubmitKey. If not set, no key
 	// has been provided.
@@ -101,11 +97,22 @@ func (s *Server) Run(ctx context.Context) error {
 	return s.gs.Serve(lis)
 }
 
-// CreateSession implements the CreateSession RPC
-func (s *Server) CreateSession(ctx context.Context, req *pbgrpcv1.CreateSessionRequest) (*pbgrpcv1.CreateSessionResponse, error) {
-	resp := &pbgrpcv1.CreateSessionResponse{}
+// GetTime implements the GetTime RPC
+func (s *Server) GetTime(_ context.Context, req *pbgrpcv1.GetTimeRequest) (*pbgrpcv1.GetTimeResponse, error) {
+	resp := &pbgrpcv1.GetTimeResponse{}
+	resp.SetTime(time.Now().UTC().Format(time.RFC3339Nano))
+	return resp, nil
+}
+
+// GetKey implements the GetKey RPC
+func (s *Server) GetKey(ctx context.Context, req *pbgrpcv1.GetKeyRequest) (*pbgrpcv1.GetKeyResponse, error) {
+	resp := &pbgrpcv1.GetKeyResponse{}
 
 	nonce := req.GetNonce()
+	ts, err := time.Parse(time.RFC3339Nano, req.GetSignedAt())
+	if err != nil || ts.IsZero() {
+		return nil, fmt.Errorf("failed to parsed signed at %q: %w", req.GetSignedAt(), err)
+	}
 	sig := req.GetSignature()
 
 	machine, err := s.db.Machine.Get(ctx, req.GetMachineId())
@@ -131,21 +138,11 @@ func (s *Server) CreateSession(ctx context.Context, req *pbgrpcv1.CreateSessionR
 		return nil, fmt.Errorf("failed to add instance public key to encryptor: %w", err)
 	}
 
-	sessionID := uuid.New()
-	var buf bytes.Buffer
-	if err := enc.Encrypt(strings.NewReader(sessionID.String()), newNopWriteCloser(&buf)); err != nil {
-		return nil, fmt.Errorf("failed to encrypt passphrase: %w", err)
-	}
-	resp.SetEncSessionId(buf.Bytes())
-
-	s.sesMu.Lock()
-	defer s.sesMu.Unlock()
-
-	s.ses[machine.ID] = &Session{
-		CreatedAt: time.Now().UTC(),
-		ID:        sessionID,
+	if len(s.ses[machine.ID].EncKey) == 0 {
+		return nil, fmt.Errorf("key not available")
 	}
 
+	resp.SetEncKey(s.ses[machine.ID].EncKey)
 	return resp, nil
 }
 
