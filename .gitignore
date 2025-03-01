@@ -49,4 +49,5 @@ CHANGELOG.md
 ## <<Stencil::Block(custom)>>
 data/
 !data/.gitkeep
+*.key
 ## <</Stencil::Block>>

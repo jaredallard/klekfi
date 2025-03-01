@@ -7,10 +7,14 @@ import "google/protobuf/go_features.proto";
 option features.(pb.go).api_level = API_OPAQUE;
 option go_package = "git.rgst.io/internal/grpc/generated/go/rgst/klefki/v1";
 
-message GetKeyRequest {}
+message GetKeyRequest {
+  string machine_id = 1;
+  bytes signature = 2;
+  string nonce = 3;
+}
 
 message GetKeyResponse {
-  string key = 1;
+  bytes key = 1;
 }
 
 service KlefkiService {

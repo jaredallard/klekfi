@@ -39,11 +39,14 @@ disk.
 
 ### Security
 
-- Pass-phrases are encrypted using to public key of the authenticated
-  machine to prevent the pass-phrase from ever being send unencrypted or
-  being able to decrypted the key.
+- Pass-phrases are encrypted to public key of the authenticated machine
+  to prevent the pass-phrase from ever being sent unencrypted or being
+  able to decrypted the key.
 - Machine IDs are derived from the authenticated machine, through a
   signature check (public keys are stored on the server side).
+  - This technically is vulnerable to replay attacks. However, the
+    returned data is encrypted to the key holder. An attacker replaying
+    this would get encrypted data only.
 
 ### Flow
 

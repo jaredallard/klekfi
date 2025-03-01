@@ -29,8 +29,8 @@ import (
 	"git.rgst.io/homelab/klefki/internal/db/ent"
 )
 
-// getFingerprint returns a fingerprint of the key.
-func getFingerprint(pub ed25519.PublicKey) (string, error) {
+// Fingerprint returns a fingerprint of the provided key.
+func Fingerprint(pub ed25519.PublicKey) (string, error) {
 	hasher := sha256.New()
 	if _, err := hasher.Write(pub); err != nil {
 		return "", fmt.Errorf("failed to hash provided public key: %w", err)
@@ -73,7 +73,7 @@ func (m *Machine) Fingerprint() (string, error) {
 		if m.fingerprint != "" {
 			return // NOOP if already set.
 		}
-		m.fingerprint, err = getFingerprint(m.PublicKey)
+		m.fingerprint, err = Fingerprint(m.PublicKey)
 	})
 	if err != nil {
 		return "", fmt.Errorf("failed to calculate fingerprint: %w", err)
@@ -120,4 +120,37 @@ func NewMachine() (*Machine, error) {
 	}
 
 	return &Machine{PublicKey: pub, PrivateKey: priv}, nil
+}
+
+// DecodePrivateKey decodes a private key that was encoded by
+// [Machine.EncodePrivateKey].
+func DecodePrivateKey(data []byte) (ed25519.PrivateKey, error) {
+	b, _ := pem.Decode(data)
+	if b == nil {
+		return nil, fmt.Errorf("failed to parse private key as PEM encoded data")
+	}
+	if b.Type != "ED25519 PRIVATE KEY" {
+		return nil, fmt.Errorf("expected type \"ED25519 PRIVATE KEY\", got %s", b.Type)
+	}
+
+	k, err := x509.ParsePKCS8PrivateKey(b.Bytes)
+	if err != nil {
+		return nil, err
+	}
+
+	pk, ok := k.(ed25519.PrivateKey)
+	if !ok {
+		return nil, fmt.Errorf("expected ed25519.PrivateKey, got %T", k)
+	}
+	return pk, nil
+}
+
+// Verify takes the provided pubKey and determines if the provided
+// signature was made by it, for the nonce. A nil error is success.
+func Verify(pubKey ed25519.PublicKey, sig []byte, nonce string) error {
+	if ed25519.Verify(pubKey, []byte(nonce), sig) {
+		return nil
+	}
+
+	return fmt.Errorf("invalid signature")
 }

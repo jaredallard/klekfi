@@ -27,11 +27,7 @@ import (
 )
 
 func main() {
-	exitCode := 0
-	defer func() { os.Exit(exitCode) }()
-
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, os.Kill)
-	defer cancel()
 
 	rootCmd := &cobra.Command{
 		Use:   "klefkictl",
@@ -41,9 +37,12 @@ func main() {
 		newNewCommand(),
 		newListCommand(),
 		newDeleteCommand(),
+		newRequestsCommand(),
 	)
 	if err := rootCmd.ExecuteContext(ctx); err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		exitCode = 1
+		os.Exit(1)
 	}
+
+	cancel()
 }

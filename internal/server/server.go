@@ -19,23 +19,52 @@
 package server
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"net"
+	"strings"
 
+	"git.rgst.io/homelab/klefki/internal/db"
+	"git.rgst.io/homelab/klefki/internal/db/ent"
+	"git.rgst.io/homelab/klefki/internal/machines"
 	pbgrpcv1 "git.rgst.io/homelab/klefki/internal/server/grpc/generated/go/rgst/klefki/v1"
+	"git.rgst.io/homelab/sigtool/v3/sign"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
 
+// nopWriteCloser is a no-op [io.WriteCloser]
+type nopWriteCloser struct {
+	io.Writer
+}
+
+// Close implements [io.Closer]
+func (nwc nopWriteCloser) Close() error {
+	return nil
+}
+
+// newNopWriteCloser creates a new nopWriteCloser
+func newNopWriteCloser(w io.Writer) *nopWriteCloser {
+	return &nopWriteCloser{w}
+}
+
 // Server is a Klefki gRPC server
 type Server struct {
 	gs *grpc.Server
+	db *ent.Client
 	pbgrpcv1.UnimplementedKlefkiServiceServer
 }
 
 // Run starts the server
-func (s *Server) Run(_ context.Context) error {
+func (s *Server) Run(ctx context.Context) error {
+	var err error
+	s.db, err = db.New(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to open DB: %w", err)
+	}
+
 	s.gs = grpc.NewServer()
 	pbgrpcv1.RegisterKlefkiServiceServer(s.gs, s)
 	reflection.Register(s.gs)
@@ -50,9 +79,42 @@ func (s *Server) Run(_ context.Context) error {
 }
 
 // GetKey implements the GetKey request
-func (s *Server) GetKey(_ context.Context, _ *pbgrpcv1.GetKeyRequest) (*pbgrpcv1.GetKeyResponse, error) {
+func (s *Server) GetKey(ctx context.Context, req *pbgrpcv1.GetKeyRequest) (*pbgrpcv1.GetKeyResponse, error) {
 	resp := &pbgrpcv1.GetKeyResponse{}
-	resp.SetKey("hello-world")
+
+	nonce := req.GetNonce()
+	sig := req.GetSignature()
+
+	machine, err := s.db.Machine.Get(ctx, req.GetMachineId())
+	if err != nil {
+		return nil, err
+	}
+
+	if err := machines.Verify(machine.PublicKey, sig, nonce); err != nil {
+		return nil, err
+	}
+
+	spubk, err := sign.PublicKeyFromBytes(machine.PublicKey)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create pub key for encryption: %w", err)
+	}
+
+	enc, err := sign.NewEncryptor(nil, 1024)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create encryptor instance: %w", err)
+	}
+
+	if err := enc.AddRecipient(spubk); err != nil {
+		return nil, fmt.Errorf("failed to add instance public key to encryptor: %w", err)
+	}
+
+	// TODO(jaredallard): Wait for input here.
+	var buf bytes.Buffer
+	if err := enc.Encrypt(strings.NewReader("hello world"), newNopWriteCloser(&buf)); err != nil {
+		return nil, fmt.Errorf("failed to encrypt passphrase: %w", err)
+	}
+
+	resp.SetKey(buf.Bytes())
 	return resp, nil
 }
 
@@ -63,7 +125,6 @@ func (s *Server) Close(_ context.Context) error {
 	}
 
 	fmt.Println("shutting down server")
-
 	s.gs.GracefulStop()
-	return nil
+	return s.db.Close()
 }
