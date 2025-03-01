@@ -33,6 +33,7 @@ type Machine struct {
 func (Machine) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("id").Comment("Fingerprint of the public key"),
+		field.String("name").Comment("User friendly name of this machine (e.g., hostname)").Unique(),
 		field.Bytes("public_key").Comment("Public key of the machine"),
 		field.String("created_at").Comment("When this machine was added in UTC").Default(time.Now().UTC().Format(time.RFC3339)),
 	}

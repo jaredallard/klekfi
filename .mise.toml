@@ -31,12 +31,12 @@ run = ["git-cliff --config .cliff.toml --output CHANGELOG.md"]
 alias = "format"
 description = "Format code"
 run = [
-	"go mod tidy",
-	"gofmt -s -w .",
-	"goimports -w .",
-	"shfmt -w .",
-	"bun node_modules/.bin/prettier --write '**/*.{json,yaml,yml,md,jsonschema.json}'",
-	"buf format -w",
+  "go mod tidy",
+  "gofmt -s -w .",
+  "goimports -w .",
+  "shfmt -w .",
+  "bun node_modules/.bin/prettier --write '**/*.{json,yaml,yml,md,jsonschema.json}'",
+  "buf format -w",
 ]
 
 [tasks.lint]

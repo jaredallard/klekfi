@@ -14,7 +14,7 @@ func init() {
 	machineFields := schema.Machine{}.Fields()
 	_ = machineFields
 	// machineDescCreatedAt is the schema descriptor for created_at field.
-	machineDescCreatedAt := machineFields[2].Descriptor()
+	machineDescCreatedAt := machineFields[3].Descriptor()
 	// machine.DefaultCreatedAt holds the default value on creation for the created_at field.
 	machine.DefaultCreatedAt = machineDescCreatedAt.Default.(string)
 }

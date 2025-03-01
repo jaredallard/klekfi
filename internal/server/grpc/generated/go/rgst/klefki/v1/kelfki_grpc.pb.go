@@ -8,7 +8,6 @@ package v1
 
 import (
 	context "context"
-
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -20,14 +19,20 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	KlefkiService_GetKey_FullMethodName = "/rgst.klefki.v1.KlefkiService/GetKey"
+	KlefkiService_CreateSession_FullMethodName = "/rgst.klefki.v1.KlefkiService/CreateSession"
+	KlefkiService_GetKey_FullMethodName        = "/rgst.klefki.v1.KlefkiService/GetKey"
+	KlefkiService_ListSessions_FullMethodName  = "/rgst.klefki.v1.KlefkiService/ListSessions"
+	KlefkiService_SubmitKey_FullMethodName     = "/rgst.klefki.v1.KlefkiService/SubmitKey"
 )
 
 // KlefkiServiceClient is the client API for KlefkiService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type KlefkiServiceClient interface {
+	CreateSession(ctx context.Context, in *CreateSessionRequest, opts ...grpc.CallOption) (*CreateSessionResponse, error)
 	GetKey(ctx context.Context, in *GetKeyRequest, opts ...grpc.CallOption) (*GetKeyResponse, error)
+	ListSessions(ctx context.Context, in *ListSessionsRequest, opts ...grpc.CallOption) (*ListSessionsResponse, error)
+	SubmitKey(ctx context.Context, in *SubmitKeyRequest, opts ...grpc.CallOption) (*SubmitKeyResponse, error)
 }
 
 type klefkiServiceClient struct {
@@ -36,6 +41,16 @@ type klefkiServiceClient struct {
 
 func NewKlefkiServiceClient(cc grpc.ClientConnInterface) KlefkiServiceClient {
 	return &klefkiServiceClient{cc}
+}
+
+func (c *klefkiServiceClient) CreateSession(ctx context.Context, in *CreateSessionRequest, opts ...grpc.CallOption) (*CreateSessionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateSessionResponse)
+	err := c.cc.Invoke(ctx, KlefkiService_CreateSession_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *klefkiServiceClient) GetKey(ctx context.Context, in *GetKeyRequest, opts ...grpc.CallOption) (*GetKeyResponse, error) {
@@ -48,11 +63,34 @@ func (c *klefkiServiceClient) GetKey(ctx context.Context, in *GetKeyRequest, opt
 	return out, nil
 }
 
+func (c *klefkiServiceClient) ListSessions(ctx context.Context, in *ListSessionsRequest, opts ...grpc.CallOption) (*ListSessionsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListSessionsResponse)
+	err := c.cc.Invoke(ctx, KlefkiService_ListSessions_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *klefkiServiceClient) SubmitKey(ctx context.Context, in *SubmitKeyRequest, opts ...grpc.CallOption) (*SubmitKeyResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SubmitKeyResponse)
+	err := c.cc.Invoke(ctx, KlefkiService_SubmitKey_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // KlefkiServiceServer is the server API for KlefkiService service.
 // All implementations must embed UnimplementedKlefkiServiceServer
 // for forward compatibility.
 type KlefkiServiceServer interface {
+	CreateSession(context.Context, *CreateSessionRequest) (*CreateSessionResponse, error)
 	GetKey(context.Context, *GetKeyRequest) (*GetKeyResponse, error)
+	ListSessions(context.Context, *ListSessionsRequest) (*ListSessionsResponse, error)
+	SubmitKey(context.Context, *SubmitKeyRequest) (*SubmitKeyResponse, error)
 	mustEmbedUnimplementedKlefkiServiceServer()
 }
 
@@ -63,8 +101,17 @@ type KlefkiServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedKlefkiServiceServer struct{}
 
+func (UnimplementedKlefkiServiceServer) CreateSession(context.Context, *CreateSessionRequest) (*CreateSessionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateSession not implemented")
+}
 func (UnimplementedKlefkiServiceServer) GetKey(context.Context, *GetKeyRequest) (*GetKeyResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetKey not implemented")
+}
+func (UnimplementedKlefkiServiceServer) ListSessions(context.Context, *ListSessionsRequest) (*ListSessionsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListSessions not implemented")
+}
+func (UnimplementedKlefkiServiceServer) SubmitKey(context.Context, *SubmitKeyRequest) (*SubmitKeyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SubmitKey not implemented")
 }
 func (UnimplementedKlefkiServiceServer) mustEmbedUnimplementedKlefkiServiceServer() {}
 func (UnimplementedKlefkiServiceServer) testEmbeddedByValue()                       {}
@@ -87,6 +134,24 @@ func RegisterKlefkiServiceServer(s grpc.ServiceRegistrar, srv KlefkiServiceServe
 	s.RegisterService(&KlefkiService_ServiceDesc, srv)
 }
 
+func _KlefkiService_CreateSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateSessionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KlefkiServiceServer).CreateSession(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: KlefkiService_CreateSession_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KlefkiServiceServer).CreateSession(ctx, req.(*CreateSessionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _KlefkiService_GetKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetKeyRequest)
 	if err := dec(in); err != nil {
@@ -105,6 +170,42 @@ func _KlefkiService_GetKey_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _KlefkiService_ListSessions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListSessionsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KlefkiServiceServer).ListSessions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: KlefkiService_ListSessions_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KlefkiServiceServer).ListSessions(ctx, req.(*ListSessionsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _KlefkiService_SubmitKey_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SubmitKeyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(KlefkiServiceServer).SubmitKey(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: KlefkiService_SubmitKey_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(KlefkiServiceServer).SubmitKey(ctx, req.(*SubmitKeyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // KlefkiService_ServiceDesc is the grpc.ServiceDesc for KlefkiService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -113,8 +214,20 @@ var KlefkiService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*KlefkiServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
+			MethodName: "CreateSession",
+			Handler:    _KlefkiService_CreateSession_Handler,
+		},
+		{
 			MethodName: "GetKey",
 			Handler:    _KlefkiService_GetKey_Handler,
+		},
+		{
+			MethodName: "ListSessions",
+			Handler:    _KlefkiService_ListSessions_Handler,
+		},
+		{
+			MethodName: "SubmitKey",
+			Handler:    _KlefkiService_SubmitKey_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

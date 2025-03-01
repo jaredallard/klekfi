@@ -19,6 +19,12 @@ type MachineCreate struct {
 	hooks    []Hook
 }
 
+// SetName sets the "name" field.
+func (mc *MachineCreate) SetName(s string) *MachineCreate {
+	mc.mutation.SetName(s)
+	return mc
+}
+
 // SetPublicKey sets the "public_key" field.
 func (mc *MachineCreate) SetPublicKey(b []byte) *MachineCreate {
 	mc.mutation.SetPublicKey(b)
@@ -88,6 +94,9 @@ func (mc *MachineCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (mc *MachineCreate) check() error {
+	if _, ok := mc.mutation.Name(); !ok {
+		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Machine.name"`)}
+	}
 	if _, ok := mc.mutation.PublicKey(); !ok {
 		return &ValidationError{Name: "public_key", err: errors.New(`ent: missing required field "Machine.public_key"`)}
 	}
@@ -128,6 +137,10 @@ func (mc *MachineCreate) createSpec() (*Machine, *sqlgraph.CreateSpec) {
 	if id, ok := mc.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = id
+	}
+	if value, ok := mc.mutation.Name(); ok {
+		_spec.SetField(machine.FieldName, field.TypeString, value)
+		_node.Name = value
 	}
 	if value, ok := mc.mutation.PublicKey(); ok {
 		_spec.SetField(machine.FieldPublicKey, field.TypeBytes, value)

@@ -11,8 +11,9 @@ var (
 	// MachinesColumns holds the columns for the "machines" table.
 	MachinesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString},
+		{Name: "name", Type: field.TypeString, Unique: true},
 		{Name: "public_key", Type: field.TypeBytes},
-		{Name: "created_at", Type: field.TypeString, Default: "2025-03-01T18:10:35Z"},
+		{Name: "created_at", Type: field.TypeString, Default: "2025-03-01T18:59:51Z"},
 	}
 	// MachinesTable holds the schema information for the "machines" table.
 	MachinesTable = &schema.Table{

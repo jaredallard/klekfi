@@ -11,6 +11,8 @@ const (
 	Label = "machine"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldName holds the string denoting the name field in the database.
+	FieldName = "name"
 	// FieldPublicKey holds the string denoting the public_key field in the database.
 	FieldPublicKey = "public_key"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
@@ -22,6 +24,7 @@ const (
 // Columns holds all SQL columns for machine fields.
 var Columns = []string{
 	FieldID,
+	FieldName,
 	FieldPublicKey,
 	FieldCreatedAt,
 }
@@ -47,6 +50,11 @@ type OrderOption func(*sql.Selector)
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByName orders the results by the name field.
+func ByName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
 // ByCreatedAt orders the results by the created_at field.

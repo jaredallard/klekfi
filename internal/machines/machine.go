@@ -27,6 +27,7 @@ import (
 	"sync"
 
 	"git.rgst.io/homelab/klefki/internal/db/ent"
+	pbgrpcv1 "git.rgst.io/homelab/klefki/internal/server/grpc/generated/go/rgst/klefki/v1"
 )
 
 // Fingerprint returns a fingerprint of the provided key.
@@ -153,4 +154,12 @@ func Verify(pubKey ed25519.PublicKey, sig []byte, nonce string) error {
 	}
 
 	return fmt.Errorf("invalid signature")
+}
+
+// GRPCMachine converts a [ent.Machine] into a [pbgrpcv1.Machine].
+func GRPCMachine(m *ent.Machine) *pbgrpcv1.Machine {
+	return (&pbgrpcv1.Machine_builder{
+		Id:        &m.ID,
+		PublicKey: m.PublicKey,
+	}).Build()
 }

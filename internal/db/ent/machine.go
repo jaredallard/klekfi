@@ -17,6 +17,8 @@ type Machine struct {
 	// ID of the ent.
 	// Fingerprint of the public key
 	ID string `json:"id,omitempty"`
+	// User friendly name of this machine (e.g., hostname)
+	Name string `json:"name,omitempty"`
 	// Public key of the machine
 	PublicKey []byte `json:"public_key,omitempty"`
 	// When this machine was added in UTC
@@ -31,7 +33,7 @@ func (*Machine) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case machine.FieldPublicKey:
 			values[i] = new([]byte)
-		case machine.FieldID, machine.FieldCreatedAt:
+		case machine.FieldID, machine.FieldName, machine.FieldCreatedAt:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -53,6 +55,12 @@ func (m *Machine) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value.Valid {
 				m.ID = value.String
+			}
+		case machine.FieldName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field name", values[i])
+			} else if value.Valid {
+				m.Name = value.String
 			}
 		case machine.FieldPublicKey:
 			if value, ok := values[i].(*[]byte); !ok {
@@ -102,6 +110,9 @@ func (m *Machine) String() string {
 	var builder strings.Builder
 	builder.WriteString("Machine(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", m.ID))
+	builder.WriteString("name=")
+	builder.WriteString(m.Name)
+	builder.WriteString(", ")
 	builder.WriteString("public_key=")
 	builder.WriteString(fmt.Sprintf("%v", m.PublicKey))
 	builder.WriteString(", ")

@@ -27,6 +27,20 @@ func (mu *MachineUpdate) Where(ps ...predicate.Machine) *MachineUpdate {
 	return mu
 }
 
+// SetName sets the "name" field.
+func (mu *MachineUpdate) SetName(s string) *MachineUpdate {
+	mu.mutation.SetName(s)
+	return mu
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (mu *MachineUpdate) SetNillableName(s *string) *MachineUpdate {
+	if s != nil {
+		mu.SetName(*s)
+	}
+	return mu
+}
+
 // SetPublicKey sets the "public_key" field.
 func (mu *MachineUpdate) SetPublicKey(b []byte) *MachineUpdate {
 	mu.mutation.SetPublicKey(b)
@@ -88,6 +102,9 @@ func (mu *MachineUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if value, ok := mu.mutation.Name(); ok {
+		_spec.SetField(machine.FieldName, field.TypeString, value)
+	}
 	if value, ok := mu.mutation.PublicKey(); ok {
 		_spec.SetField(machine.FieldPublicKey, field.TypeBytes, value)
 	}
@@ -112,6 +129,20 @@ type MachineUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *MachineMutation
+}
+
+// SetName sets the "name" field.
+func (muo *MachineUpdateOne) SetName(s string) *MachineUpdateOne {
+	muo.mutation.SetName(s)
+	return muo
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (muo *MachineUpdateOne) SetNillableName(s *string) *MachineUpdateOne {
+	if s != nil {
+		muo.SetName(*s)
+	}
+	return muo
 }
 
 // SetPublicKey sets the "public_key" field.
@@ -204,6 +235,9 @@ func (muo *MachineUpdateOne) sqlSave(ctx context.Context) (_node *Machine, err e
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := muo.mutation.Name(); ok {
+		_spec.SetField(machine.FieldName, field.TypeString, value)
 	}
 	if value, ok := muo.mutation.PublicKey(); ok {
 		_spec.SetField(machine.FieldPublicKey, field.TypeBytes, value)

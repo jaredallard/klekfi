@@ -262,12 +262,12 @@ func (mq *MachineQuery) Clone() *MachineQuery {
 // Example:
 //
 //	var v []struct {
-//		PublicKey []byte `json:"public_key,omitempty"`
+//		Name string `json:"name,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Machine.Query().
-//		GroupBy(machine.FieldPublicKey).
+//		GroupBy(machine.FieldName).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (mq *MachineQuery) GroupBy(field string, fields ...string) *MachineGroupBy {
@@ -285,11 +285,11 @@ func (mq *MachineQuery) GroupBy(field string, fields ...string) *MachineGroupBy 
 // Example:
 //
 //	var v []struct {
-//		PublicKey []byte `json:"public_key,omitempty"`
+//		Name string `json:"name,omitempty"`
 //	}
 //
 //	client.Machine.Query().
-//		Select(machine.FieldPublicKey).
+//		Select(machine.FieldName).
 //		Scan(ctx, &v)
 func (mq *MachineQuery) Select(fields ...string) *MachineSelect {
 	mq.ctx.Fields = append(mq.ctx.Fields, fields...)

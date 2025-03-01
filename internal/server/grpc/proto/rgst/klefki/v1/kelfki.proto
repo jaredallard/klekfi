@@ -8,15 +8,44 @@ option features.(pb.go).api_level = API_OPAQUE;
 option go_package = "git.rgst.io/internal/grpc/generated/go/rgst/klefki/v1";
 
 message GetKeyRequest {
+  string session_id = 1;
+}
+
+message GetKeyResponse {
+  bytes enc_key = 1;
+}
+
+message CreateSessionRequest {
   string machine_id = 1;
   bytes signature = 2;
   string nonce = 3;
 }
 
-message GetKeyResponse {
-  bytes key = 1;
+message CreateSessionResponse {
+  bytes enc_session_id = 1;
 }
 
+message ListSessionsRequest {}
+
+message Machine {
+  string id = 1;
+  bytes public_key = 2;
+}
+
+message ListSessionsResponse {
+  repeated Machine machines = 1;
+}
+
+message SubmitKeyRequest {
+  string machine_id = 1;
+  bytes enc_key = 2;
+}
+
+message SubmitKeyResponse {}
+
 service KlefkiService {
+  rpc CreateSession(CreateSessionRequest) returns (CreateSessionResponse);
   rpc GetKey(GetKeyRequest) returns (GetKeyResponse);
+  rpc ListSessions(ListSessionsRequest) returns (ListSessionsResponse);
+  rpc SubmitKey(SubmitKeyRequest) returns (SubmitKeyResponse);
 }

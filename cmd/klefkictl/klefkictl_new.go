@@ -27,6 +27,7 @@ import (
 
 // newNewCommand creates a new [cobra.Command]
 func newNewCommand() *cobra.Command {
+	// TODO(jaredallard): Support setting the name of the machine.
 	return &cobra.Command{
 		Use:   "new",
 		Short: "Create a new machine",

@@ -25,12 +25,15 @@ import (
 	"io"
 	"net"
 	"strings"
+	"sync"
+	"time"
 
 	"git.rgst.io/homelab/klefki/internal/db"
 	"git.rgst.io/homelab/klefki/internal/db/ent"
 	"git.rgst.io/homelab/klefki/internal/machines"
 	pbgrpcv1 "git.rgst.io/homelab/klefki/internal/server/grpc/generated/go/rgst/klefki/v1"
 	"git.rgst.io/homelab/sigtool/v3/sign"
+	"github.com/google/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -50,15 +53,35 @@ func newNopWriteCloser(w io.Writer) *nopWriteCloser {
 	return &nopWriteCloser{w}
 }
 
+type Session struct {
+	// CreatedAt is when the provided session was created. Should be in
+	// UTC.
+	CreatedAt time.Time
+
+	// ID is the session ID, this is used as an authenticate gate.
+	ID uuid.UUID
+
+	// EncKey is the encrypted provided by SubmitKey. If not set, no key
+	// has been provided.
+	EncKey []byte
+}
+
 // Server is a Klefki gRPC server
 type Server struct {
 	gs *grpc.Server
 	db *ent.Client
+
+	// ses is a machine_id -> Session map
+	ses   map[string]*Session
+	sesMu sync.Mutex
+
 	pbgrpcv1.UnimplementedKlefkiServiceServer
 }
 
 // Run starts the server
 func (s *Server) Run(ctx context.Context) error {
+	s.ses = make(map[string]*Session)
+
 	var err error
 	s.db, err = db.New(ctx)
 	if err != nil {
@@ -78,9 +101,9 @@ func (s *Server) Run(ctx context.Context) error {
 	return s.gs.Serve(lis)
 }
 
-// GetKey implements the GetKey request
-func (s *Server) GetKey(ctx context.Context, req *pbgrpcv1.GetKeyRequest) (*pbgrpcv1.GetKeyResponse, error) {
-	resp := &pbgrpcv1.GetKeyResponse{}
+// CreateSession implements the CreateSession RPC
+func (s *Server) CreateSession(ctx context.Context, req *pbgrpcv1.CreateSessionRequest) (*pbgrpcv1.CreateSessionResponse, error) {
+	resp := &pbgrpcv1.CreateSessionResponse{}
 
 	nonce := req.GetNonce()
 	sig := req.GetSignature()
@@ -108,13 +131,39 @@ func (s *Server) GetKey(ctx context.Context, req *pbgrpcv1.GetKeyRequest) (*pbgr
 		return nil, fmt.Errorf("failed to add instance public key to encryptor: %w", err)
 	}
 
-	// TODO(jaredallard): Wait for input here.
+	sessionID := uuid.New()
 	var buf bytes.Buffer
-	if err := enc.Encrypt(strings.NewReader("hello world"), newNopWriteCloser(&buf)); err != nil {
+	if err := enc.Encrypt(strings.NewReader(sessionID.String()), newNopWriteCloser(&buf)); err != nil {
 		return nil, fmt.Errorf("failed to encrypt passphrase: %w", err)
 	}
+	resp.SetEncSessionId(buf.Bytes())
 
-	resp.SetKey(buf.Bytes())
+	s.sesMu.Lock()
+	defer s.sesMu.Unlock()
+
+	s.ses[machine.ID] = &Session{
+		CreatedAt: time.Now().UTC(),
+		ID:        sessionID,
+	}
+
+	return resp, nil
+}
+
+// ListSessions implements the ListSessions RPC.
+func (s *Server) ListSessions(ctx context.Context, _ *pbgrpcv1.ListSessionsRequest) (*pbgrpcv1.ListSessionsResponse, error) {
+	resp := &pbgrpcv1.ListSessionsResponse{}
+
+	grpcMachines := make([]*pbgrpcv1.Machine, 0, len(s.ses))
+	for machineID := range s.ses {
+		machine, err := s.db.Machine.Get(ctx, machineID)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get machine %q: %w", machineID, err)
+		}
+
+		grpcMachines = append(grpcMachines, machines.GRPCMachine(machine))
+	}
+
+	resp.SetMachines(grpcMachines)
 	return resp, nil
 }
 

@@ -7,12 +7,11 @@
 package v1
 
 import (
-	reflect "reflect"
-	unsafe "unsafe"
-
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	_ "google.golang.org/protobuf/types/gofeaturespb"
+	reflect "reflect"
+	unsafe "unsafe"
 )
 
 const (
@@ -24,9 +23,7 @@ const (
 
 type GetKeyRequest struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_MachineId   *string                `protobuf:"bytes,1,opt,name=machine_id,json=machineId"`
-	xxx_hidden_Signature   []byte                 `protobuf:"bytes,2,opt,name=signature"`
-	xxx_hidden_Nonce       *string                `protobuf:"bytes,3,opt,name=nonce"`
+	xxx_hidden_SessionId   *string                `protobuf:"bytes,1,opt,name=session_id,json=sessionId"`
 	XXX_raceDetectHookData protoimpl.RaceDetectHookData
 	XXX_presence           [1]uint32
 	unknownFields          protoimpl.UnknownFields
@@ -58,117 +55,53 @@ func (x *GetKeyRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *GetKeyRequest) GetMachineId() string {
+func (x *GetKeyRequest) GetSessionId() string {
 	if x != nil {
-		if x.xxx_hidden_MachineId != nil {
-			return *x.xxx_hidden_MachineId
+		if x.xxx_hidden_SessionId != nil {
+			return *x.xxx_hidden_SessionId
 		}
 		return ""
 	}
 	return ""
 }
 
-func (x *GetKeyRequest) GetSignature() []byte {
-	if x != nil {
-		return x.xxx_hidden_Signature
-	}
-	return nil
+func (x *GetKeyRequest) SetSessionId(v string) {
+	x.xxx_hidden_SessionId = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 1)
 }
 
-func (x *GetKeyRequest) GetNonce() string {
-	if x != nil {
-		if x.xxx_hidden_Nonce != nil {
-			return *x.xxx_hidden_Nonce
-		}
-		return ""
-	}
-	return ""
-}
-
-func (x *GetKeyRequest) SetMachineId(v string) {
-	x.xxx_hidden_MachineId = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 3)
-}
-
-func (x *GetKeyRequest) SetSignature(v []byte) {
-	if v == nil {
-		v = []byte{}
-	}
-	x.xxx_hidden_Signature = v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 3)
-}
-
-func (x *GetKeyRequest) SetNonce(v string) {
-	x.xxx_hidden_Nonce = &v
-	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 3)
-}
-
-func (x *GetKeyRequest) HasMachineId() bool {
+func (x *GetKeyRequest) HasSessionId() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
 }
 
-func (x *GetKeyRequest) HasSignature() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
-}
-
-func (x *GetKeyRequest) HasNonce() bool {
-	if x == nil {
-		return false
-	}
-	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
-}
-
-func (x *GetKeyRequest) ClearMachineId() {
+func (x *GetKeyRequest) ClearSessionId() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
-	x.xxx_hidden_MachineId = nil
-}
-
-func (x *GetKeyRequest) ClearSignature() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
-	x.xxx_hidden_Signature = nil
-}
-
-func (x *GetKeyRequest) ClearNonce() {
-	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
-	x.xxx_hidden_Nonce = nil
+	x.xxx_hidden_SessionId = nil
 }
 
 type GetKeyRequest_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	MachineId *string
-	Signature []byte
-	Nonce     *string
+	SessionId *string
 }
 
 func (b0 GetKeyRequest_builder) Build() *GetKeyRequest {
 	m0 := &GetKeyRequest{}
 	b, x := &b0, m0
 	_, _ = b, x
-	if b.MachineId != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 3)
-		x.xxx_hidden_MachineId = b.MachineId
-	}
-	if b.Signature != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 3)
-		x.xxx_hidden_Signature = b.Signature
-	}
-	if b.Nonce != nil {
-		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 3)
-		x.xxx_hidden_Nonce = b.Nonce
+	if b.SessionId != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 1)
+		x.xxx_hidden_SessionId = b.SessionId
 	}
 	return m0
 }
 
 type GetKeyResponse struct {
 	state                  protoimpl.MessageState `protogen:"opaque.v1"`
-	xxx_hidden_Key         []byte                 `protobuf:"bytes,1,opt,name=key"`
+	xxx_hidden_EncKey      []byte                 `protobuf:"bytes,1,opt,name=enc_key,json=encKey"`
 	XXX_raceDetectHookData protoimpl.RaceDetectHookData
 	XXX_presence           [1]uint32
 	unknownFields          protoimpl.UnknownFields
@@ -200,47 +133,636 @@ func (x *GetKeyResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-func (x *GetKeyResponse) GetKey() []byte {
+func (x *GetKeyResponse) GetEncKey() []byte {
 	if x != nil {
-		return x.xxx_hidden_Key
+		return x.xxx_hidden_EncKey
 	}
 	return nil
 }
 
-func (x *GetKeyResponse) SetKey(v []byte) {
+func (x *GetKeyResponse) SetEncKey(v []byte) {
 	if v == nil {
 		v = []byte{}
 	}
-	x.xxx_hidden_Key = v
+	x.xxx_hidden_EncKey = v
 	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 1)
 }
 
-func (x *GetKeyResponse) HasKey() bool {
+func (x *GetKeyResponse) HasEncKey() bool {
 	if x == nil {
 		return false
 	}
 	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
 }
 
-func (x *GetKeyResponse) ClearKey() {
+func (x *GetKeyResponse) ClearEncKey() {
 	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
-	x.xxx_hidden_Key = nil
+	x.xxx_hidden_EncKey = nil
 }
 
 type GetKeyResponse_builder struct {
 	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
 
-	Key []byte
+	EncKey []byte
 }
 
 func (b0 GetKeyResponse_builder) Build() *GetKeyResponse {
 	m0 := &GetKeyResponse{}
 	b, x := &b0, m0
 	_, _ = b, x
-	if b.Key != nil {
+	if b.EncKey != nil {
 		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 1)
-		x.xxx_hidden_Key = b.Key
+		x.xxx_hidden_EncKey = b.EncKey
 	}
+	return m0
+}
+
+type CreateSessionRequest struct {
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_MachineId   *string                `protobuf:"bytes,1,opt,name=machine_id,json=machineId"`
+	xxx_hidden_Signature   []byte                 `protobuf:"bytes,2,opt,name=signature"`
+	xxx_hidden_Nonce       *string                `protobuf:"bytes,3,opt,name=nonce"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
+}
+
+func (x *CreateSessionRequest) Reset() {
+	*x = CreateSessionRequest{}
+	mi := &file_rgst_klefki_v1_kelfki_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateSessionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateSessionRequest) ProtoMessage() {}
+
+func (x *CreateSessionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rgst_klefki_v1_kelfki_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *CreateSessionRequest) GetMachineId() string {
+	if x != nil {
+		if x.xxx_hidden_MachineId != nil {
+			return *x.xxx_hidden_MachineId
+		}
+		return ""
+	}
+	return ""
+}
+
+func (x *CreateSessionRequest) GetSignature() []byte {
+	if x != nil {
+		return x.xxx_hidden_Signature
+	}
+	return nil
+}
+
+func (x *CreateSessionRequest) GetNonce() string {
+	if x != nil {
+		if x.xxx_hidden_Nonce != nil {
+			return *x.xxx_hidden_Nonce
+		}
+		return ""
+	}
+	return ""
+}
+
+func (x *CreateSessionRequest) SetMachineId(v string) {
+	x.xxx_hidden_MachineId = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 3)
+}
+
+func (x *CreateSessionRequest) SetSignature(v []byte) {
+	if v == nil {
+		v = []byte{}
+	}
+	x.xxx_hidden_Signature = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 3)
+}
+
+func (x *CreateSessionRequest) SetNonce(v string) {
+	x.xxx_hidden_Nonce = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 3)
+}
+
+func (x *CreateSessionRequest) HasMachineId() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *CreateSessionRequest) HasSignature() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *CreateSessionRequest) HasNonce() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
+}
+
+func (x *CreateSessionRequest) ClearMachineId() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_MachineId = nil
+}
+
+func (x *CreateSessionRequest) ClearSignature() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_Signature = nil
+}
+
+func (x *CreateSessionRequest) ClearNonce() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
+	x.xxx_hidden_Nonce = nil
+}
+
+type CreateSessionRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	MachineId *string
+	Signature []byte
+	Nonce     *string
+}
+
+func (b0 CreateSessionRequest_builder) Build() *CreateSessionRequest {
+	m0 := &CreateSessionRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.MachineId != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 3)
+		x.xxx_hidden_MachineId = b.MachineId
+	}
+	if b.Signature != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 3)
+		x.xxx_hidden_Signature = b.Signature
+	}
+	if b.Nonce != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 3)
+		x.xxx_hidden_Nonce = b.Nonce
+	}
+	return m0
+}
+
+type CreateSessionResponse struct {
+	state                   protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_EncSessionId []byte                 `protobuf:"bytes,1,opt,name=enc_session_id,json=encSessionId"`
+	XXX_raceDetectHookData  protoimpl.RaceDetectHookData
+	XXX_presence            [1]uint32
+	unknownFields           protoimpl.UnknownFields
+	sizeCache               protoimpl.SizeCache
+}
+
+func (x *CreateSessionResponse) Reset() {
+	*x = CreateSessionResponse{}
+	mi := &file_rgst_klefki_v1_kelfki_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateSessionResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateSessionResponse) ProtoMessage() {}
+
+func (x *CreateSessionResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_rgst_klefki_v1_kelfki_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *CreateSessionResponse) GetEncSessionId() []byte {
+	if x != nil {
+		return x.xxx_hidden_EncSessionId
+	}
+	return nil
+}
+
+func (x *CreateSessionResponse) SetEncSessionId(v []byte) {
+	if v == nil {
+		v = []byte{}
+	}
+	x.xxx_hidden_EncSessionId = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 1)
+}
+
+func (x *CreateSessionResponse) HasEncSessionId() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *CreateSessionResponse) ClearEncSessionId() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_EncSessionId = nil
+}
+
+type CreateSessionResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	EncSessionId []byte
+}
+
+func (b0 CreateSessionResponse_builder) Build() *CreateSessionResponse {
+	m0 := &CreateSessionResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.EncSessionId != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 1)
+		x.xxx_hidden_EncSessionId = b.EncSessionId
+	}
+	return m0
+}
+
+type ListSessionsRequest struct {
+	state         protoimpl.MessageState `protogen:"opaque.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListSessionsRequest) Reset() {
+	*x = ListSessionsRequest{}
+	mi := &file_rgst_klefki_v1_kelfki_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListSessionsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListSessionsRequest) ProtoMessage() {}
+
+func (x *ListSessionsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rgst_klefki_v1_kelfki_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+type ListSessionsRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+}
+
+func (b0 ListSessionsRequest_builder) Build() *ListSessionsRequest {
+	m0 := &ListSessionsRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	return m0
+}
+
+type Machine struct {
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id          *string                `protobuf:"bytes,1,opt,name=id"`
+	xxx_hidden_PublicKey   []byte                 `protobuf:"bytes,2,opt,name=public_key,json=publicKey"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
+}
+
+func (x *Machine) Reset() {
+	*x = Machine{}
+	mi := &file_rgst_klefki_v1_kelfki_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Machine) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Machine) ProtoMessage() {}
+
+func (x *Machine) ProtoReflect() protoreflect.Message {
+	mi := &file_rgst_klefki_v1_kelfki_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *Machine) GetId() string {
+	if x != nil {
+		if x.xxx_hidden_Id != nil {
+			return *x.xxx_hidden_Id
+		}
+		return ""
+	}
+	return ""
+}
+
+func (x *Machine) GetPublicKey() []byte {
+	if x != nil {
+		return x.xxx_hidden_PublicKey
+	}
+	return nil
+}
+
+func (x *Machine) SetId(v string) {
+	x.xxx_hidden_Id = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 2)
+}
+
+func (x *Machine) SetPublicKey(v []byte) {
+	if v == nil {
+		v = []byte{}
+	}
+	x.xxx_hidden_PublicKey = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
+}
+
+func (x *Machine) HasId() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *Machine) HasPublicKey() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *Machine) ClearId() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_Id = nil
+}
+
+func (x *Machine) ClearPublicKey() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_PublicKey = nil
+}
+
+type Machine_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id        *string
+	PublicKey []byte
+}
+
+func (b0 Machine_builder) Build() *Machine {
+	m0 := &Machine{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Id != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 2)
+		x.xxx_hidden_Id = b.Id
+	}
+	if b.PublicKey != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
+		x.xxx_hidden_PublicKey = b.PublicKey
+	}
+	return m0
+}
+
+type ListSessionsResponse struct {
+	state               protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Machines *[]*Machine            `protobuf:"bytes,1,rep,name=machines"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
+}
+
+func (x *ListSessionsResponse) Reset() {
+	*x = ListSessionsResponse{}
+	mi := &file_rgst_klefki_v1_kelfki_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListSessionsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListSessionsResponse) ProtoMessage() {}
+
+func (x *ListSessionsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_rgst_klefki_v1_kelfki_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *ListSessionsResponse) GetMachines() []*Machine {
+	if x != nil {
+		if x.xxx_hidden_Machines != nil {
+			return *x.xxx_hidden_Machines
+		}
+	}
+	return nil
+}
+
+func (x *ListSessionsResponse) SetMachines(v []*Machine) {
+	x.xxx_hidden_Machines = &v
+}
+
+type ListSessionsResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Machines []*Machine
+}
+
+func (b0 ListSessionsResponse_builder) Build() *ListSessionsResponse {
+	m0 := &ListSessionsResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Machines = &b.Machines
+	return m0
+}
+
+type SubmitKeyRequest struct {
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_MachineId   *string                `protobuf:"bytes,1,opt,name=machine_id,json=machineId"`
+	xxx_hidden_EncKey      []byte                 `protobuf:"bytes,2,opt,name=enc_key,json=encKey"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
+}
+
+func (x *SubmitKeyRequest) Reset() {
+	*x = SubmitKeyRequest{}
+	mi := &file_rgst_klefki_v1_kelfki_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SubmitKeyRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SubmitKeyRequest) ProtoMessage() {}
+
+func (x *SubmitKeyRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rgst_klefki_v1_kelfki_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+func (x *SubmitKeyRequest) GetMachineId() string {
+	if x != nil {
+		if x.xxx_hidden_MachineId != nil {
+			return *x.xxx_hidden_MachineId
+		}
+		return ""
+	}
+	return ""
+}
+
+func (x *SubmitKeyRequest) GetEncKey() []byte {
+	if x != nil {
+		return x.xxx_hidden_EncKey
+	}
+	return nil
+}
+
+func (x *SubmitKeyRequest) SetMachineId(v string) {
+	x.xxx_hidden_MachineId = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 2)
+}
+
+func (x *SubmitKeyRequest) SetEncKey(v []byte) {
+	if v == nil {
+		v = []byte{}
+	}
+	x.xxx_hidden_EncKey = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
+}
+
+func (x *SubmitKeyRequest) HasMachineId() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *SubmitKeyRequest) HasEncKey() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *SubmitKeyRequest) ClearMachineId() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_MachineId = nil
+}
+
+func (x *SubmitKeyRequest) ClearEncKey() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_EncKey = nil
+}
+
+type SubmitKeyRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	MachineId *string
+	EncKey    []byte
+}
+
+func (b0 SubmitKeyRequest_builder) Build() *SubmitKeyRequest {
+	m0 := &SubmitKeyRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.MachineId != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 2)
+		x.xxx_hidden_MachineId = b.MachineId
+	}
+	if b.EncKey != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
+		x.xxx_hidden_EncKey = b.EncKey
+	}
+	return m0
+}
+
+type SubmitKeyResponse struct {
+	state         protoimpl.MessageState `protogen:"opaque.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SubmitKeyResponse) Reset() {
+	*x = SubmitKeyResponse{}
+	mi := &file_rgst_klefki_v1_kelfki_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SubmitKeyResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SubmitKeyResponse) ProtoMessage() {}
+
+func (x *SubmitKeyResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_rgst_klefki_v1_kelfki_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+type SubmitKeyResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+}
+
+func (b0 SubmitKeyResponse_builder) Build() *SubmitKeyResponse {
+	m0 := &SubmitKeyResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
 	return m0
 }
 
@@ -252,40 +774,95 @@ var file_rgst_klefki_v1_kelfki_proto_rawDesc = string([]byte{
 	0x67, 0x73, 0x74, 0x2e, 0x6b, 0x6c, 0x65, 0x66, 0x6b, 0x69, 0x2e, 0x76, 0x31, 0x1a, 0x21, 0x67,
 	0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x67,
 	0x6f, 0x5f, 0x66, 0x65, 0x61, 0x74, 0x75, 0x72, 0x65, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x22, 0x62, 0x0a, 0x0d, 0x47, 0x65, 0x74, 0x4b, 0x65, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
-	0x74, 0x12, 0x1d, 0x0a, 0x0a, 0x6d, 0x61, 0x63, 0x68, 0x69, 0x6e, 0x65, 0x5f, 0x69, 0x64, 0x18,
-	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x6d, 0x61, 0x63, 0x68, 0x69, 0x6e, 0x65, 0x49, 0x64,
-	0x12, 0x1c, 0x0a, 0x09, 0x73, 0x69, 0x67, 0x6e, 0x61, 0x74, 0x75, 0x72, 0x65, 0x18, 0x02, 0x20,
-	0x01, 0x28, 0x0c, 0x52, 0x09, 0x73, 0x69, 0x67, 0x6e, 0x61, 0x74, 0x75, 0x72, 0x65, 0x12, 0x14,
-	0x0a, 0x05, 0x6e, 0x6f, 0x6e, 0x63, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x6e,
-	0x6f, 0x6e, 0x63, 0x65, 0x22, 0x22, 0x0a, 0x0e, 0x47, 0x65, 0x74, 0x4b, 0x65, 0x79, 0x52, 0x65,
-	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x10, 0x0a, 0x03, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20,
-	0x01, 0x28, 0x0c, 0x52, 0x03, 0x6b, 0x65, 0x79, 0x32, 0x58, 0x0a, 0x0d, 0x4b, 0x6c, 0x65, 0x66,
-	0x6b, 0x69, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x47, 0x0a, 0x06, 0x47, 0x65, 0x74,
-	0x4b, 0x65, 0x79, 0x12, 0x1d, 0x2e, 0x72, 0x67, 0x73, 0x74, 0x2e, 0x6b, 0x6c, 0x65, 0x66, 0x6b,
-	0x69, 0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x4b, 0x65, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65,
-	0x73, 0x74, 0x1a, 0x1e, 0x2e, 0x72, 0x67, 0x73, 0x74, 0x2e, 0x6b, 0x6c, 0x65, 0x66, 0x6b, 0x69,
-	0x2e, 0x76, 0x31, 0x2e, 0x47, 0x65, 0x74, 0x4b, 0x65, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
-	0x73, 0x65, 0x42, 0x3f, 0x5a, 0x35, 0x67, 0x69, 0x74, 0x2e, 0x72, 0x67, 0x73, 0x74, 0x2e, 0x69,
-	0x6f, 0x2f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x6e, 0x61, 0x6c, 0x2f, 0x67, 0x72, 0x70, 0x63, 0x2f,
-	0x67, 0x65, 0x6e, 0x65, 0x72, 0x61, 0x74, 0x65, 0x64, 0x2f, 0x67, 0x6f, 0x2f, 0x72, 0x67, 0x73,
-	0x74, 0x2f, 0x6b, 0x6c, 0x65, 0x66, 0x6b, 0x69, 0x2f, 0x76, 0x31, 0x92, 0x03, 0x05, 0xd2, 0x3e,
-	0x02, 0x10, 0x03, 0x62, 0x08, 0x65, 0x64, 0x69, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x70, 0xe8, 0x07,
+	0x22, 0x2e, 0x0a, 0x0d, 0x47, 0x65, 0x74, 0x4b, 0x65, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x12, 0x1d, 0x0a, 0x0a, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x5f, 0x69, 0x64, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x49, 0x64,
+	0x22, 0x29, 0x0a, 0x0e, 0x47, 0x65, 0x74, 0x4b, 0x65, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e,
+	0x73, 0x65, 0x12, 0x17, 0x0a, 0x07, 0x65, 0x6e, 0x63, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x0c, 0x52, 0x06, 0x65, 0x6e, 0x63, 0x4b, 0x65, 0x79, 0x22, 0x69, 0x0a, 0x14, 0x43,
+	0x72, 0x65, 0x61, 0x74, 0x65, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x12, 0x1d, 0x0a, 0x0a, 0x6d, 0x61, 0x63, 0x68, 0x69, 0x6e, 0x65, 0x5f, 0x69,
+	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x6d, 0x61, 0x63, 0x68, 0x69, 0x6e, 0x65,
+	0x49, 0x64, 0x12, 0x1c, 0x0a, 0x09, 0x73, 0x69, 0x67, 0x6e, 0x61, 0x74, 0x75, 0x72, 0x65, 0x18,
+	0x02, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x09, 0x73, 0x69, 0x67, 0x6e, 0x61, 0x74, 0x75, 0x72, 0x65,
+	0x12, 0x14, 0x0a, 0x05, 0x6e, 0x6f, 0x6e, 0x63, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x05, 0x6e, 0x6f, 0x6e, 0x63, 0x65, 0x22, 0x3d, 0x0a, 0x15, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65,
+	0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
+	0x24, 0x0a, 0x0e, 0x65, 0x6e, 0x63, 0x5f, 0x73, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x5f, 0x69,
+	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x0c, 0x65, 0x6e, 0x63, 0x53, 0x65, 0x73, 0x73,
+	0x69, 0x6f, 0x6e, 0x49, 0x64, 0x22, 0x15, 0x0a, 0x13, 0x4c, 0x69, 0x73, 0x74, 0x53, 0x65, 0x73,
+	0x73, 0x69, 0x6f, 0x6e, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x38, 0x0a, 0x07,
+	0x4d, 0x61, 0x63, 0x68, 0x69, 0x6e, 0x65, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x1d, 0x0a, 0x0a, 0x70, 0x75, 0x62, 0x6c, 0x69,
+	0x63, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x09, 0x70, 0x75, 0x62,
+	0x6c, 0x69, 0x63, 0x4b, 0x65, 0x79, 0x22, 0x4b, 0x0a, 0x14, 0x4c, 0x69, 0x73, 0x74, 0x53, 0x65,
+	0x73, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x33,
+	0x0a, 0x08, 0x6d, 0x61, 0x63, 0x68, 0x69, 0x6e, 0x65, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b,
+	0x32, 0x17, 0x2e, 0x72, 0x67, 0x73, 0x74, 0x2e, 0x6b, 0x6c, 0x65, 0x66, 0x6b, 0x69, 0x2e, 0x76,
+	0x31, 0x2e, 0x4d, 0x61, 0x63, 0x68, 0x69, 0x6e, 0x65, 0x52, 0x08, 0x6d, 0x61, 0x63, 0x68, 0x69,
+	0x6e, 0x65, 0x73, 0x22, 0x4a, 0x0a, 0x10, 0x53, 0x75, 0x62, 0x6d, 0x69, 0x74, 0x4b, 0x65, 0x79,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1d, 0x0a, 0x0a, 0x6d, 0x61, 0x63, 0x68, 0x69,
+	0x6e, 0x65, 0x5f, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x6d, 0x61, 0x63,
+	0x68, 0x69, 0x6e, 0x65, 0x49, 0x64, 0x12, 0x17, 0x0a, 0x07, 0x65, 0x6e, 0x63, 0x5f, 0x6b, 0x65,
+	0x79, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x06, 0x65, 0x6e, 0x63, 0x4b, 0x65, 0x79, 0x22,
+	0x13, 0x0a, 0x11, 0x53, 0x75, 0x62, 0x6d, 0x69, 0x74, 0x4b, 0x65, 0x79, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x32, 0xe3, 0x02, 0x0a, 0x0d, 0x4b, 0x6c, 0x65, 0x66, 0x6b, 0x69, 0x53,
+	0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12, 0x5c, 0x0a, 0x0d, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65,
+	0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x24, 0x2e, 0x72, 0x67, 0x73, 0x74, 0x2e, 0x6b,
+	0x6c, 0x65, 0x66, 0x6b, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x53,
+	0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x25, 0x2e,
+	0x72, 0x67, 0x73, 0x74, 0x2e, 0x6b, 0x6c, 0x65, 0x66, 0x6b, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x43,
+	0x72, 0x65, 0x61, 0x74, 0x65, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x47, 0x0a, 0x06, 0x47, 0x65, 0x74, 0x4b, 0x65, 0x79, 0x12, 0x1d,
+	0x2e, 0x72, 0x67, 0x73, 0x74, 0x2e, 0x6b, 0x6c, 0x65, 0x66, 0x6b, 0x69, 0x2e, 0x76, 0x31, 0x2e,
+	0x47, 0x65, 0x74, 0x4b, 0x65, 0x79, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1e, 0x2e,
+	0x72, 0x67, 0x73, 0x74, 0x2e, 0x6b, 0x6c, 0x65, 0x66, 0x6b, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x47,
+	0x65, 0x74, 0x4b, 0x65, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x59, 0x0a,
+	0x0c, 0x4c, 0x69, 0x73, 0x74, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x12, 0x23, 0x2e,
+	0x72, 0x67, 0x73, 0x74, 0x2e, 0x6b, 0x6c, 0x65, 0x66, 0x6b, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x4c,
+	0x69, 0x73, 0x74, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x1a, 0x24, 0x2e, 0x72, 0x67, 0x73, 0x74, 0x2e, 0x6b, 0x6c, 0x65, 0x66, 0x6b, 0x69,
+	0x2e, 0x76, 0x31, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x53, 0x65, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x73,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x50, 0x0a, 0x09, 0x53, 0x75, 0x62, 0x6d,
+	0x69, 0x74, 0x4b, 0x65, 0x79, 0x12, 0x20, 0x2e, 0x72, 0x67, 0x73, 0x74, 0x2e, 0x6b, 0x6c, 0x65,
+	0x66, 0x6b, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x53, 0x75, 0x62, 0x6d, 0x69, 0x74, 0x4b, 0x65, 0x79,
+	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x21, 0x2e, 0x72, 0x67, 0x73, 0x74, 0x2e, 0x6b,
+	0x6c, 0x65, 0x66, 0x6b, 0x69, 0x2e, 0x76, 0x31, 0x2e, 0x53, 0x75, 0x62, 0x6d, 0x69, 0x74, 0x4b,
+	0x65, 0x79, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x3f, 0x5a, 0x35, 0x67, 0x69,
+	0x74, 0x2e, 0x72, 0x67, 0x73, 0x74, 0x2e, 0x69, 0x6f, 0x2f, 0x69, 0x6e, 0x74, 0x65, 0x72, 0x6e,
+	0x61, 0x6c, 0x2f, 0x67, 0x72, 0x70, 0x63, 0x2f, 0x67, 0x65, 0x6e, 0x65, 0x72, 0x61, 0x74, 0x65,
+	0x64, 0x2f, 0x67, 0x6f, 0x2f, 0x72, 0x67, 0x73, 0x74, 0x2f, 0x6b, 0x6c, 0x65, 0x66, 0x6b, 0x69,
+	0x2f, 0x76, 0x31, 0x92, 0x03, 0x05, 0xd2, 0x3e, 0x02, 0x10, 0x03, 0x62, 0x08, 0x65, 0x64, 0x69,
+	0x74, 0x69, 0x6f, 0x6e, 0x73, 0x70, 0xe8, 0x07,
 })
 
-var file_rgst_klefki_v1_kelfki_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_rgst_klefki_v1_kelfki_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_rgst_klefki_v1_kelfki_proto_goTypes = []any{
-	(*GetKeyRequest)(nil),  // 0: rgst.klefki.v1.GetKeyRequest
-	(*GetKeyResponse)(nil), // 1: rgst.klefki.v1.GetKeyResponse
+	(*GetKeyRequest)(nil),         // 0: rgst.klefki.v1.GetKeyRequest
+	(*GetKeyResponse)(nil),        // 1: rgst.klefki.v1.GetKeyResponse
+	(*CreateSessionRequest)(nil),  // 2: rgst.klefki.v1.CreateSessionRequest
+	(*CreateSessionResponse)(nil), // 3: rgst.klefki.v1.CreateSessionResponse
+	(*ListSessionsRequest)(nil),   // 4: rgst.klefki.v1.ListSessionsRequest
+	(*Machine)(nil),               // 5: rgst.klefki.v1.Machine
+	(*ListSessionsResponse)(nil),  // 6: rgst.klefki.v1.ListSessionsResponse
+	(*SubmitKeyRequest)(nil),      // 7: rgst.klefki.v1.SubmitKeyRequest
+	(*SubmitKeyResponse)(nil),     // 8: rgst.klefki.v1.SubmitKeyResponse
 }
 var file_rgst_klefki_v1_kelfki_proto_depIdxs = []int32{
-	0, // 0: rgst.klefki.v1.KlefkiService.GetKey:input_type -> rgst.klefki.v1.GetKeyRequest
-	1, // 1: rgst.klefki.v1.KlefkiService.GetKey:output_type -> rgst.klefki.v1.GetKeyResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	5, // 0: rgst.klefki.v1.ListSessionsResponse.machines:type_name -> rgst.klefki.v1.Machine
+	2, // 1: rgst.klefki.v1.KlefkiService.CreateSession:input_type -> rgst.klefki.v1.CreateSessionRequest
+	0, // 2: rgst.klefki.v1.KlefkiService.GetKey:input_type -> rgst.klefki.v1.GetKeyRequest
+	4, // 3: rgst.klefki.v1.KlefkiService.ListSessions:input_type -> rgst.klefki.v1.ListSessionsRequest
+	7, // 4: rgst.klefki.v1.KlefkiService.SubmitKey:input_type -> rgst.klefki.v1.SubmitKeyRequest
+	3, // 5: rgst.klefki.v1.KlefkiService.CreateSession:output_type -> rgst.klefki.v1.CreateSessionResponse
+	1, // 6: rgst.klefki.v1.KlefkiService.GetKey:output_type -> rgst.klefki.v1.GetKeyResponse
+	6, // 7: rgst.klefki.v1.KlefkiService.ListSessions:output_type -> rgst.klefki.v1.ListSessionsResponse
+	8, // 8: rgst.klefki.v1.KlefkiService.SubmitKey:output_type -> rgst.klefki.v1.SubmitKeyResponse
+	5, // [5:9] is the sub-list for method output_type
+	1, // [1:5] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_rgst_klefki_v1_kelfki_proto_init() }
@@ -299,7 +876,7 @@ func file_rgst_klefki_v1_kelfki_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_rgst_klefki_v1_kelfki_proto_rawDesc), len(file_rgst_klefki_v1_kelfki_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
