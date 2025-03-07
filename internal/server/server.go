@@ -117,7 +117,7 @@ func (s *Server) GetKey(ctx context.Context, req *pbgrpcv1.GetKeyRequest) (*pbgr
 		return nil, fmt.Errorf("failed to parsed signed at %q: %w", req.GetSignedAt(), err)
 	}
 	ts = ts.UTC() // Always operate with UTC time.
-	if time.Since(ts) < 5*time.Minute {
+	if time.Since(ts) > 5*time.Minute {
 		return nil, fmt.Errorf("signature has expired")
 	}
 
