@@ -84,6 +84,8 @@ func (s *Server) Run(ctx context.Context) error {
 		return fmt.Errorf("failed to open DB: %w", err)
 	}
 
+	// TODO(jaredallard): Clean up expired sessions after X time period.
+
 	s.gs = grpc.NewServer()
 	pbgrpcv1.RegisterKlefkiServiceServer(s.gs, s)
 	reflection.Register(s.gs)
@@ -100,8 +102,19 @@ func (s *Server) Run(ctx context.Context) error {
 // GetTime implements the GetTime RPC
 func (s *Server) GetTime(_ context.Context, req *pbgrpcv1.GetTimeRequest) (*pbgrpcv1.GetTimeResponse, error) {
 	resp := &pbgrpcv1.GetTimeResponse{}
-	resp.SetTime(time.Now().UTC().Format(time.RFC3339Nano))
+	resp.SetTime(time.Now().Format(time.RFC3339Nano))
 	return resp, nil
+}
+
+// SubmitKey implements the SubmitKey RPC
+func (s *Server) SubmitKey(ctx context.Context, req *pbgrpcv1.SubmitKeyRequest) (*pbgrpcv1.SubmitKeyResponse, error) {
+	machineID := req.GetMachineId()
+	if _, ok := s.ses[machineID]; !ok {
+		return nil, fmt.Errorf("failed to find machine ID %q", machineID)
+	}
+
+	s.ses[machineID].EncKey = req.GetEncKey()
+	return &pbgrpcv1.SubmitKeyResponse{}, nil
 }
 
 // GetKey implements the GetKey RPC
@@ -113,6 +126,7 @@ func (s *Server) GetKey(ctx context.Context, req *pbgrpcv1.GetKeyRequest) (*pbgr
 	if err != nil || ts.IsZero() {
 		return nil, fmt.Errorf("failed to parsed signed at %q: %w", req.GetSignedAt(), err)
 	}
+	ts = ts.UTC() // Always operate with UTC time.
 	sig := req.GetSignature()
 
 	machine, err := s.db.Machine.Get(ctx, req.GetMachineId())
@@ -138,11 +152,21 @@ func (s *Server) GetKey(ctx context.Context, req *pbgrpcv1.GetKeyRequest) (*pbgr
 		return nil, fmt.Errorf("failed to add instance public key to encryptor: %w", err)
 	}
 
+	// Track the last time the machine asked for a key. This is what backs
+	// the sessions api
+	if _, ok := s.ses[machine.ID]; !ok {
+		s.ses[machine.ID] = &Session{}
+	}
+	s.ses[machine.ID].LastAsked = time.Now()
+
 	if len(s.ses[machine.ID].EncKey) == 0 {
 		return nil, fmt.Errorf("key not available")
 	}
-
 	resp.SetEncKey(s.ses[machine.ID].EncKey)
+
+	// Reset the session
+	delete(s.ses, machine.ID)
+
 	return resp, nil
 }
 
@@ -157,7 +181,10 @@ func (s *Server) ListSessions(ctx context.Context, _ *pbgrpcv1.ListSessionsReque
 			return nil, fmt.Errorf("failed to get machine %q: %w", machineID, err)
 		}
 
-		grpcMachines = append(grpcMachines, machines.GRPCMachine(machine))
+		// If the machine asked recently, return it
+		gMachine := machines.GRPCMachine(machine)
+		gMachine.SetLastAsked(s.ses[machineID].LastAsked.Format(time.RFC3339Nano))
+		grpcMachines = append(grpcMachines, gMachine)
 	}
 
 	resp.SetMachines(grpcMachines)

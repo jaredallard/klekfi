@@ -28,6 +28,7 @@ message ListSessionsRequest {}
 message Machine {
   string id = 1;
   bytes public_key = 2;
+  string last_asked = 3;
 }
 
 message ListSessionsResponse {

@@ -13,7 +13,7 @@ var (
 		{Name: "id", Type: field.TypeString},
 		{Name: "name", Type: field.TypeString, Unique: true},
 		{Name: "public_key", Type: field.TypeBytes},
-		{Name: "created_at", Type: field.TypeString, Default: "2025-03-01T23:41:53Z"},
+		{Name: "created_at", Type: field.TypeString, Default: "2025-03-07T05:15:58Z"},
 	}
 	// MachinesTable holds the schema information for the "machines" table.
 	MachinesTable = &schema.Table{

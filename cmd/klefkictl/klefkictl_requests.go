@@ -21,7 +21,9 @@ import (
 	"bytes"
 	"crypto/ed25519"
 	"fmt"
+	"io"
 	"os"
+	"strings"
 	"text/tabwriter"
 
 	pbgrpcv1 "git.rgst.io/homelab/klefki/internal/server/grpc/generated/go/rgst/klefki/v1"
@@ -33,6 +35,21 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// nopWriteCloser is a no-op [io.WriteCloser]
+type nopWriteCloser struct {
+	io.Writer
+}
+
+// Close implements [io.Closer]
+func (nwc nopWriteCloser) Close() error {
+	return nil
+}
+
+// newNopWriteCloser creates a new nopWriteCloser
+func newNopWriteCloser(w io.Writer) *nopWriteCloser {
+	return &nopWriteCloser{w}
+}
+
 // newRequestsCommand creates a requests [cobra.Command]
 func newRequestsCommand() *cobra.Command {
 	cmd := &cobra.Command{
@@ -40,18 +57,19 @@ func newRequestsCommand() *cobra.Command {
 		Short: "Make requests to a klefki server",
 	}
 	cmd.AddCommand(
-		newGetKeyRequestCommand(),
+		newGetKeyCommand(),
 		newListSessionsCommand(),
+		newSubmitKeyCommand(),
 	)
 	flags := cmd.Flags()
 	flags.String("hostname", "127.0.0.1:5300", "hostname of the klefki server to connect to")
 	return cmd
 }
 
-// newGetKeyRequestCommand creates a getkeyrequest [cobra.Command]
-func newGetKeyRequestCommand() *cobra.Command {
+// newGetKeyCommand creates a getkeyrequest [cobra.Command]
+func newGetKeyCommand() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "getkeyrequest",
+		Use:   "getkey",
 		Short: "Get the passphrase for the given machine",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
@@ -84,11 +102,17 @@ func newGetKeyRequestCommand() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			defer kcclose() //nolint:errcheck // Why: Best effort
+			defer kcclose() //nolint:errcheck // Why: Btiest effort
+
+			tsResp, err := kc.GetTime(cmd.Context(), &pbgrpcv1.GetTimeRequest{})
+			if err != nil {
+				return fmt.Errorf("failed to connect to server to get time: %w", err)
+			}
 
 			req := &pbgrpcv1.GetKeyRequest{}
 			req.SetMachineId(machineID)
 			req.SetNonce(uuid.New().String())
+			req.SetSignedAt(tsResp.GetTime())
 			req.SetSignature(ed25519.Sign(pk, []byte(req.GetNonce())))
 
 			resp, err := kc.GetKey(cmd.Context(), req)
@@ -125,7 +149,7 @@ func newListSessionsCommand() *cobra.Command {
 		Short: "Return a list of all machines waiting for a key to be provided",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			kc, kcclose, err := client.Dial(cmd.Flag("hostname").Value.String())
+			kc, kcclose, err := client.Dial(cmd.Parent().Flag("hostname").Value.String())
 			if err != nil {
 				return err
 			}
@@ -143,11 +167,74 @@ func newListSessionsCommand() *cobra.Command {
 			}
 
 			tw := tabwriter.NewWriter(os.Stdout, 2, 2, 2, ' ', 0)
-			fmt.Fprint(tw, "FINGERPRINT\n")
+			fmt.Fprint(tw, "FINGERPRINT\tLAST ASKED\n")
 			for _, m := range machines {
-				fmt.Fprintf(tw, "%s\n", m.GetId())
+				fmt.Fprintf(tw, "%s\t%s\n", m.GetId(), m.GetLastAsked())
 			}
 			return tw.Flush()
+		},
+	}
+}
+
+// newSubmitKeyCommand creates a submitekey [cobra.Command]
+func newSubmitKeyCommand() *cobra.Command {
+	return &cobra.Command{
+		Use:   "submitkey <machineID> <passphrase>",
+		Short: "Submit a passphrase to a given machine by its ID",
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			machineID := args[0]
+			// TODO(jaredallard): don't expect to be passed
+			passphrase := args[1]
+
+			kc, kcclose, err := client.Dial(cmd.Parent().Flag("hostname").Value.String())
+			if err != nil {
+				return err
+			}
+			defer kcclose() //nolint:errcheck // Why: Best effort
+
+			resp, err := kc.ListSessions(cmd.Context(), &pbgrpcv1.ListSessionsRequest{})
+			if err != nil {
+				return fmt.Errorf("failed to get key from server: %w", err)
+			}
+
+			machines := resp.GetMachines()
+
+			var machine *pbgrpcv1.Machine
+			for _, m := range machines {
+				if m.GetId() == machineID {
+					machine = m
+					break
+				}
+			}
+			if machine == nil {
+				return fmt.Errorf("no sessions found for %q", machineID)
+			}
+
+			pubKey, err := sign.PublicKeyFromBytes(machine.GetPublicKey())
+			if err != nil {
+				return fmt.Errorf("failed to convert machine's public key to encryption public key: %w", err)
+			}
+
+			enc, err := sign.NewEncryptor(nil, 1024)
+			if err != nil {
+				return fmt.Errorf("failed to create decryptor: %w", err)
+			}
+
+			if err := enc.AddRecipient(pubKey); err != nil {
+				return fmt.Errorf("failed to set private key on decryptor: %w", err)
+			}
+
+			var buf bytes.Buffer
+			if err := enc.Encrypt(strings.NewReader(passphrase), newNopWriteCloser(&buf)); err != nil {
+				return fmt.Errorf("failed to decrypt session ID: %w", err)
+			}
+
+			req := &pbgrpcv1.SubmitKeyRequest{}
+			req.SetEncKey(buf.Bytes())
+			req.SetMachineId(machineID)
+			_, err = kc.SubmitKey(cmd.Context(), req)
+			return err
 		},
 	}
 }

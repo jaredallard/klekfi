@@ -29,10 +29,12 @@ import (
 func newNewCommand() *cobra.Command {
 	// TODO(jaredallard): Support setting the name of the machine.
 	return &cobra.Command{
-		Use:   "new",
+		Use:   "new <machineName>",
 		Short: "Create a new machine",
-		Args:  cobra.NoArgs,
-		RunE: func(cmd *cobra.Command, _ []string) error {
+		Args:  cobra.ExactArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			name := args[0] // Checked by [cobra.ExactArgs] above.
+
 			db, err := db.New(cmd.Context())
 			if err != nil {
 				return fmt.Errorf("failed to open DB: %w", err)
@@ -54,7 +56,7 @@ func newNewCommand() *cobra.Command {
 				return err
 			}
 
-			if err := db.Machine.Create().
+			if err := db.Machine.Create().SetName(name).
 				SetID(fprint).SetPublicKey(m.PublicKey).
 				Exec(cmd.Context()); err != nil {
 				return fmt.Errorf("failed to write to DB: %w", err)
