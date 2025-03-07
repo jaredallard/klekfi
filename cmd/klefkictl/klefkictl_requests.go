@@ -96,8 +96,6 @@ func newGetKeyCommand() *cobra.Command {
 				return fmt.Errorf("failed to create private key for decryption: %w", err)
 			}
 
-			fmt.Printf("Sending GetKey request: machine_id=%s\n", machineID)
-
 			kc, kcclose, err := client.Dial(hostname)
 			if err != nil {
 				return err
