@@ -182,7 +182,7 @@ func newSubmitKeyCommand() *cobra.Command {
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			machineID := args[0]
-			// TODO(jaredallard): don't expect to be passed
+			// TODO(jaredallard): don't expect to be passed as an arg
 			passphrase := args[1]
 
 			kc, kcclose, err := client.Dial(cmd.Parent().Flag("hostname").Value.String())
