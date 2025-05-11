@@ -35,11 +35,11 @@ func newNewCommand() *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			name := args[0] // Checked by [cobra.ExactArgs] above.
 
-			db, err := db.New(cmd.Context())
+			dbc, err := db.New(cmd.Context())
 			if err != nil {
 				return fmt.Errorf("failed to open DB: %w", err)
 			}
-			defer db.Close()
+			defer dbc.Close()
 
 			m, err := machines.NewMachine()
 			if err != nil {
@@ -56,7 +56,7 @@ func newNewCommand() *cobra.Command {
 				return err
 			}
 
-			if err := db.Machine.Create().SetName(name).
+			if err := dbc.Machine.Create().SetName(name).
 				SetID(fprint).SetPublicKey(m.PublicKey).
 				Exec(cmd.Context()); err != nil {
 				return fmt.Errorf("failed to write to DB: %w", err)

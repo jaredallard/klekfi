@@ -15,6 +15,8 @@
 //
 // SPDX-License-Identifier: AGPL-3.0
 
+// Package machines contains all of the code for creating and managing
+// machines.
 package machines
 
 import (

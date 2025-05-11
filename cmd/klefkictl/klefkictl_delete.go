@@ -31,13 +31,13 @@ func newDeleteCommand() *cobra.Command {
 		Short: "Delete a known machine by fingerprint",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			db, err := db.New(cmd.Context())
+			dbc, err := db.New(cmd.Context())
 			if err != nil {
 				return fmt.Errorf("failed to open DB: %w", err)
 			}
-			defer db.Close()
+			defer dbc.Close()
 
-			return db.Machine.DeleteOneID(args[0]).Exec(cmd.Context())
+			return dbc.Machine.DeleteOneID(args[0]).Exec(cmd.Context())
 		},
 	}
 }

@@ -15,6 +15,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0
 
+// Package main implements the kelfkictl CLI.
 package main
 
 import (

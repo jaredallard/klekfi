@@ -15,6 +15,7 @@
 //
 // SPDX-License-Identifier: AGPL-3.0
 
+// Package client contains the gRPC client for communicating with Klefki.
 package client
 
 import (

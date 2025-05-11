@@ -34,13 +34,13 @@ func newListCommand() *cobra.Command {
 		Short: "List all known machines",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			db, err := db.New(cmd.Context())
+			dbc, err := db.New(cmd.Context())
 			if err != nil {
 				return fmt.Errorf("failed to open DB: %w", err)
 			}
-			defer db.Close()
+			defer dbc.Close()
 
-			ms, err := db.Machine.Query().All(cmd.Context())
+			ms, err := dbc.Machine.Query().All(cmd.Context())
 			if err != nil {
 				return err
 			}

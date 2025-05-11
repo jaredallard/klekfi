@@ -158,15 +158,15 @@ func newListSessionsCommand() *cobra.Command {
 				return fmt.Errorf("failed to get key from server: %w", err)
 			}
 
-			machines := resp.GetMachines()
-			if len(machines) == 0 {
+			ms := resp.GetMachines()
+			if len(ms) == 0 {
 				fmt.Println("No results found")
 				return nil
 			}
 
 			tw := tabwriter.NewWriter(os.Stdout, 2, 2, 2, ' ', 0)
 			fmt.Fprint(tw, "FINGERPRINT\tLAST ASKED\n")
-			for _, m := range machines {
+			for _, m := range ms {
 				fmt.Fprintf(tw, "%s\t%s\n", m.GetId(), m.GetLastAsked())
 			}
 			return tw.Flush()
@@ -196,10 +196,10 @@ func newSubmitKeyCommand() *cobra.Command {
 				return fmt.Errorf("failed to get key from server: %w", err)
 			}
 
-			machines := resp.GetMachines()
+			ms := resp.GetMachines()
 
 			var machine *pbgrpcv1.Machine
-			for _, m := range machines {
+			for _, m := range ms {
 				if m.GetId() == machineID {
 					machine = m
 					break
