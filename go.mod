@@ -6,7 +6,7 @@ require (
 	entgo.io/ent v0.14.3
 	git.rgst.io/homelab/sigtool/v3 v3.2.3-jaredallard.2
 	github.com/google/uuid v1.6.0
-	github.com/ncruces/go-sqlite3 v0.25.2
+	github.com/ncruces/go-sqlite3 v0.26.0
 	github.com/spf13/cobra v1.9.1
 	google.golang.org/grpc v1.72.2
 	google.golang.org/protobuf v1.36.6
