@@ -42,8 +42,8 @@ github.com/mattn/go-sqlite3 v1.14.16 h1:yOQRA0RpS5PFz/oikGwBEqvAWhWg5ufRz4ETLjwp
 github.com/mattn/go-sqlite3 v1.14.16/go.mod h1:2eHXhiwb8IkHr+BDWZGa96P6+rkvnG63S2DGjv9HUNg=
 github.com/mitchellh/go-wordwrap v1.0.1 h1:TLuKupo69TCn6TQSyGxwI1EblZZEsQ0vMlAFQflz0v0=
 github.com/mitchellh/go-wordwrap v1.0.1/go.mod h1:R62XHJLzvMFRBbcrT7m7WgmE1eOyTSsCt+hzestvNj0=
-github.com/ncruces/go-sqlite3 v0.26.1 h1:lBXmbmucH1Bsj57NUQR6T84UoMN7jnNImhF+ibEITJU=
-github.com/ncruces/go-sqlite3 v0.26.1/go.mod h1:XFTPtFIo1DmGCh+XVP8KGn9b/o2f+z0WZuT09x2N6eo=
+github.com/ncruces/go-sqlite3 v0.26.2 h1:5UkIBwdfMN2irpVI1dgi9TjTUlxNI06Rti1C8O7ZKVg=
+github.com/ncruces/go-sqlite3 v0.26.2/go.mod h1:XFTPtFIo1DmGCh+XVP8KGn9b/o2f+z0WZuT09x2N6eo=
 github.com/ncruces/julianday v1.0.0 h1:fH0OKwa7NWvniGQtxdJRxAgkBMolni2BjDHaWTxqt7M=
 github.com/ncruces/julianday v1.0.0/go.mod h1:Dusn2KvZrrovOMJuOt0TNXL6tB7U2E8kvza5fFc9G7g=
 github.com/olekukonko/tablewriter v0.0.5 h1:P2Ga83D34wi1o9J6Wh1mRuqd4mF/x/lgBS7N7AbDhec=
