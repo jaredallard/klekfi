@@ -9,7 +9,7 @@ require (
 	github.com/ncruces/go-sqlite3 v0.26.3
 	github.com/spf13/cobra v1.9.1
 	google.golang.org/grpc v1.73.0
-	google.golang.org/protobuf v1.36.6
+	google.golang.org/protobuf v1.36.9
 )
 
 require (
