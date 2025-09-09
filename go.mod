@@ -3,7 +3,7 @@ module git.rgst.io/homelab/klefki
 go 1.24
 
 require (
-	entgo.io/ent v0.14.3
+	entgo.io/ent v0.14.5
 	git.rgst.io/homelab/sigtool/v3 v3.2.3-jaredallard.2
 	github.com/google/uuid v1.6.0
 	github.com/ncruces/go-sqlite3 v0.26.3
@@ -13,7 +13,7 @@ require (
 )
 
 require (
-	ariga.io/atlas v0.31.1-0.20250212144724-069be8033e83 // indirect
+	ariga.io/atlas v0.32.1-0.20250325101103-175b25e1c1b9 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/bmatcuk/doublestar v1.3.4 // indirect
