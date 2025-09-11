@@ -1,12 +1,12 @@
 module git.rgst.io/homelab/klefki
 
-go 1.24
+go 1.24.0
 
 require (
 	entgo.io/ent v0.14.5
 	git.rgst.io/homelab/sigtool/v3 v3.2.3-jaredallard.2
 	github.com/google/uuid v1.6.0
-	github.com/ncruces/go-sqlite3 v0.26.3
+	github.com/ncruces/go-sqlite3 v0.29.0
 	github.com/spf13/cobra v1.9.1
 	google.golang.org/grpc v1.75.1
 	google.golang.org/protobuf v1.36.9
@@ -36,13 +36,14 @@ require (
 	github.com/tetratelabs/wazero v1.9.0 // indirect
 	github.com/zclconf/go-cty v1.16.2 // indirect
 	github.com/zclconf/go-cty-yaml v1.1.0 // indirect
-	golang.org/x/crypto v0.39.0 // indirect
-	golang.org/x/mod v0.25.0 // indirect
-	golang.org/x/net v0.41.0 // indirect
-	golang.org/x/sync v0.15.0 // indirect
-	golang.org/x/sys v0.33.0 // indirect
-	golang.org/x/text v0.26.0 // indirect
-	golang.org/x/tools v0.33.0 // indirect
+	golang.org/x/crypto v0.41.0 // indirect
+	golang.org/x/mod v0.27.0 // indirect
+	golang.org/x/net v0.43.0 // indirect
+	golang.org/x/sync v0.17.0 // indirect
+	golang.org/x/sys v0.36.0 // indirect
+	golang.org/x/text v0.29.0 // indirect
+	golang.org/x/tools v0.36.0 // indirect
+	golang.org/x/tools/go/packages/packagestest v0.1.1-deprecated // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250707201910-8d1bb00bc6a7 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
