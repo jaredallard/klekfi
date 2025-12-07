@@ -7,7 +7,7 @@ require (
 	git.rgst.io/homelab/sigtool/v3 v3.2.3-jaredallard.2
 	github.com/google/uuid v1.6.0
 	github.com/ncruces/go-sqlite3 v0.30.1
-	github.com/spf13/cobra v1.10.1
+	github.com/spf13/cobra v1.10.2
 	google.golang.org/grpc v1.77.0
 	google.golang.org/protobuf v1.36.10
 )
